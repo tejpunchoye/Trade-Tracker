@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -14,7 +13,7 @@
    Font: DM Sans + JetBrains Mono
    Theme: Dark-first, professional terminal
 ============================================= */
- 
+
 /* --- TOKENS -------------------------------- */
 :root {
   --accent: #00e676;
@@ -26,7 +25,7 @@
   --info: #2979ff;
   --buy: #00e676;
   --sell: #ff4757;
- 
+
   /* Layout */
   --top-bar-h: 56px;
   --bottom-nav-h: 70px;
@@ -34,22 +33,22 @@
   --radius-sm: 10px;
   --radius: 16px;
   --radius-lg: 22px;
- 
+
   /* Shadows */
   --shadow-sm: 0 1px 4px rgba(0,0,0,0.25);
   --shadow: 0 4px 20px rgba(0,0,0,0.35);
   --shadow-lg: 0 8px 40px rgba(0,0,0,0.5);
- 
+
   /* Typography */
   --font-body: 'DM Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
- 
+
   /* Transitions */
   --t-fast: 120ms ease;
   --t-base: 220ms ease;
   --t-slow: 380ms cubic-bezier(0.4,0,0.2,1);
 }
- 
+
 /* DARK THEME (default) */
 [data-theme="dark"] {
   --bg: #0a0a0f;
@@ -68,7 +67,7 @@
   --overlay: rgba(0,0,0,0.75);
   --skeleton: linear-gradient(90deg, #1a1a25 25%, #22222f 50%, #1a1a25 75%);
 }
- 
+
 /* LIGHT THEME */
 [data-theme="light"] {
   --bg: #f4f4f8;
@@ -87,7 +86,7 @@
   --overlay: rgba(0,0,0,0.55);
   --skeleton: linear-gradient(90deg, #ebebf0 25%, #f4f4f8 50%, #ebebf0 75%);
 }
- 
+
 /* --- RESET --------------------------------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { font-size: 16px; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
@@ -104,15 +103,15 @@ img { max-width: 100%; display: block; }
 button { cursor: pointer; border: none; background: none; font-family: inherit; }
 input, textarea, select { font-family: inherit; }
 a { color: inherit; text-decoration: none; }
- 
+
 /* --- SCROLLBAR ----------------------------- */
 ::-webkit-scrollbar { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
- 
+
 /* --- APP SHELL ----------------------------- */
 #app { display: flex; flex-direction: column; height: 100dvh; max-width: 480px; margin: 0 auto; position: relative; overflow: hidden; background: var(--bg); }
- 
+
 /* TOP BAR */
 .top-bar {
   display: flex; align-items: center; justify-content: space-between;
@@ -127,7 +126,7 @@ a { color: inherit; text-decoration: none; }
 .app-logo { display: flex; align-items: center; }
 .app-name { font-family: var(--font-mono); font-size: 15px; font-weight: 600; letter-spacing: -0.3px; color: var(--text-primary); }
 .top-bar-right { display: flex; align-items: center; gap: 4px; }
- 
+
 .icon-btn {
   display: flex; align-items: center; justify-content: center;
   width: 38px; height: 38px; border-radius: 10px;
@@ -136,7 +135,7 @@ a { color: inherit; text-decoration: none; }
 .icon-btn:hover, .icon-btn:active { background: var(--bg-3); color: var(--text-primary); }
 .icon-btn-sm { display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 8px; color: var(--text-secondary); transition: background var(--t-fast); }
 .icon-btn-sm:hover { background: var(--bg-3); }
- 
+
 /* MAIN CONTENT */
 .main-content {
   flex: 1; overflow-y: auto; overflow-x: hidden;
@@ -144,12 +143,12 @@ a { color: inherit; text-decoration: none; }
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
 }
- 
+
 /* PAGE */
 .page { display: none; animation: pageFade 260ms ease; }
 .page.active { display: block; }
 @keyframes pageFade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
- 
+
 /* BOTTOM NAV */
 .bottom-nav {
   display: flex; align-items: stretch;
@@ -175,7 +174,7 @@ a { color: inherit; text-decoration: none; }
   opacity: 0; transition: opacity var(--t-base);
 }
 .nav-btn.active::after { opacity: 1; }
- 
+
 /* SEARCH PANEL */
 .search-panel {
   position: absolute; top: var(--top-bar-h); left: 0; right: 0; z-index: 48;
@@ -208,11 +207,11 @@ a { color: inherit; text-decoration: none; }
 .search-result-type { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); text-transform: uppercase; }
 .search-result-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
 .search-empty { text-align: center; padding: 24px; color: var(--text-muted); font-size: 14px; }
- 
+
 /* =============================================
    COMPONENTS
 ============================================= */
- 
+
 /* CARDS */
 .card {
   background: var(--card-bg); border-radius: var(--radius);
@@ -221,7 +220,7 @@ a { color: inherit; text-decoration: none; }
 }
 .card:hover { background: var(--card-hover); }
 .card-sm { padding: 12px; border-radius: var(--radius-sm); }
- 
+
 /* BADGES */
 .badge {
   display: inline-flex; align-items: center; gap: 4px;
@@ -237,7 +236,7 @@ a { color: inherit; text-decoration: none; }
 .badge-pending { background: rgba(41,121,255,0.12); color: var(--info); border: 1px solid rgba(41,121,255,0.25); }
 .badge-profit { background: rgba(0,230,118,0.12); color: var(--buy); border: 1px solid rgba(0,230,118,0.25); }
 .badge-loss { background: rgba(255,71,87,0.12); color: var(--sell); border: 1px solid rgba(255,71,87,0.25); }
- 
+
 /* BUTTONS */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -260,7 +259,7 @@ a { color: inherit; text-decoration: none; }
 .btn-full { width: 100%; }
 .btn-icon { width: 38px; height: 38px; padding: 0; border-radius: 10px; }
 .btn:disabled { opacity: 0.4; pointer-events: none; }
- 
+
 /* FORM ELEMENTS */
 .form-group { display: flex; flex-direction: column; gap: 6px; }
 .form-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
@@ -280,7 +279,7 @@ a { color: inherit; text-decoration: none; }
 .form-row > .form-group { flex: 1; }
 .form-error { font-size: 12px; color: var(--danger); display: none; }
 .form-error.show { display: block; }
- 
+
 /* TOGGLE SWITCH */
 .toggle-wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--border); }
 .toggle-wrap:last-child { border-bottom: none; }
@@ -302,7 +301,7 @@ a { color: inherit; text-decoration: none; }
 }
 .toggle input:checked + .toggle-slider { background: var(--accent); }
 .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
- 
+
 /* CHECKBOX (checklist style) */
 .check-item {
   display: flex; align-items: flex-start; gap: 12px;
@@ -326,7 +325,7 @@ a { color: inherit; text-decoration: none; }
 .check-title { font-size: 13.5px; font-weight: 500; color: var(--text-primary); line-height: 1.4; }
 .check-desc { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
 .check-item.checked .check-title { color: var(--text-muted); }
- 
+
 /* CHECKLIST GROUP */
 .checklist-group { margin-bottom: 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
 .checklist-group-header {
@@ -342,7 +341,7 @@ a { color: inherit; text-decoration: none; }
 .checklist-group.collapsed .group-chevron { transform: rotate(-90deg); }
 .checklist-group-body { padding: 0 16px; max-height: 1000px; transition: max-height var(--t-slow), padding var(--t-base); overflow: hidden; }
 .checklist-group.collapsed .checklist-group-body { max-height: 0; padding-top: 0; padding-bottom: 0; }
- 
+
 /* PROGRESS BAR */
 .progress-bar-wrap { display: flex; flex-direction: column; gap: 6px; }
 .progress-bar-header { display: flex; justify-content: space-between; align-items: center; }
@@ -352,7 +351,7 @@ a { color: inherit; text-decoration: none; }
 .progress-fill { height: 100%; border-radius: 6px; background: var(--accent); transition: width 0.8s cubic-bezier(0.4,0,0.2,1); width: 0%; }
 .progress-fill.danger { background: var(--danger); }
 .progress-fill.warning { background: var(--warning); }
- 
+
 /* METRIC CARDS */
 .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .metric-card {
@@ -366,7 +365,7 @@ a { color: inherit; text-decoration: none; }
 .metric-value.red { color: var(--danger); }
 .metric-value.muted { color: var(--text-secondary); }
 .metric-sub { font-size: 11px; color: var(--text-muted); }
- 
+
 /* SCREENSHOT GRID */
 .screenshot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
 .screenshot-thumb {
@@ -391,13 +390,13 @@ a { color: inherit; text-decoration: none; }
   transition: border-color var(--t-fast), color var(--t-fast);
 }
 .add-screenshot-btn:hover { border-color: var(--accent); color: var(--accent); }
- 
+
 /* SECTION HEADER */
 .section-header { padding: 20px 16px 10px; display: flex; align-items: center; justify-content: space-between; }
 .section-title { font-size: 18px; font-weight: 700; color: var(--text-primary); }
 .section-sub { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
 .section-count { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
- 
+
 /* TABS */
 .tab-bar { display: flex; gap: 4px; padding: 4px; background: var(--bg-3); border-radius: var(--radius-sm); margin: 0 16px 16px; }
 .tab-btn {
@@ -405,7 +404,7 @@ a { color: inherit; text-decoration: none; }
   color: var(--text-muted); transition: all var(--t-fast); text-align: center;
 }
 .tab-btn.active { background: var(--card-bg); color: var(--text-primary); box-shadow: var(--shadow-sm); }
- 
+
 /* EMPTY STATE */
 .empty-state {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -414,7 +413,7 @@ a { color: inherit; text-decoration: none; }
 .empty-icon { opacity: 0.25; }
 .empty-title { font-size: 16px; font-weight: 600; color: var(--text-secondary); }
 .empty-desc { font-size: 13px; color: var(--text-muted); max-width: 260px; line-height: 1.6; }
- 
+
 /* MODALS */
 .modal-overlay {
   position: fixed; inset: 0; background: var(--overlay);
@@ -432,7 +431,7 @@ a { color: inherit; text-decoration: none; }
   animation: modalIn 280ms cubic-bezier(0.34,1.56,0.64,1);
 }
 @keyframes modalIn { from { opacity: 0; transform: scale(0.88) translateY(12px); } to { opacity: 1; transform: none; } }
- 
+
 /* STARTUP MODAL */
 .startup-modal-box { padding: 28px 24px 24px; }
 .startup-icon { display: flex; justify-content: center; margin-bottom: 18px; }
@@ -445,7 +444,7 @@ a { color: inherit; text-decoration: none; }
 .startup-actions { display: flex; flex-direction: column; gap: 12px; }
 .startup-skip { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-muted); cursor: pointer; justify-content: center; }
 .startup-skip input { accent-color: var(--accent); width: 14px; height: 14px; }
- 
+
 /* CONFIRM MODAL */
 .confirm-modal-box { padding: 28px 24px 24px; text-align: center; }
 .confirm-icon { display: flex; justify-content: center; margin-bottom: 16px; }
@@ -453,13 +452,13 @@ a { color: inherit; text-decoration: none; }
 .confirm-message { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 24px; }
 .confirm-actions { display: flex; gap: 10px; }
 .confirm-actions .btn { flex: 1; }
- 
+
 /* IMAGE VIEWER */
 .img-viewer-overlay { padding: 0; background: rgba(0,0,0,0.95); }
 .img-viewer-box { position: relative; max-width: 100vw; max-height: 100dvh; display: flex; align-items: center; justify-content: center; }
 .img-viewer-img { max-width: 100vw; max-height: 100dvh; object-fit: contain; }
 .img-viewer-close { position: fixed; top: 16px; right: 16px; z-index: 201; width: 40px; height: 40px; background: rgba(0,0,0,0.6); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; }
- 
+
 /* TOAST */
 #toast-container { position: fixed; bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 12px); left: 50%; transform: translateX(-50%); z-index: 300; display: flex; flex-direction: column; gap: 8px; pointer-events: none; max-width: 340px; width: calc(100% - 32px); }
 .toast {
@@ -477,7 +476,7 @@ a { color: inherit; text-decoration: none; }
 .toast-dot.success { background: var(--accent); }
 .toast-dot.error { background: var(--danger); }
 .toast-dot.info { background: var(--info); }
- 
+
 /* DRAWER / BOTTOM SHEET */
 .drawer-overlay {
   position: fixed; inset: 0; background: var(--overlay); z-index: 150;
@@ -501,7 +500,7 @@ a { color: inherit; text-decoration: none; }
 .drawer-body { padding: 0 20px; display: flex; flex-direction: column; gap: 14px; }
 .drawer-actions { padding: 16px 20px 0; display: flex; gap: 10px; }
 .drawer-actions .btn { flex: 1; }
- 
+
 /* =============================================
    HOME PAGE
 ============================================= */
@@ -519,10 +518,10 @@ a { color: inherit; text-decoration: none; }
 .home-hero-greeting { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 .home-hero-title { font-size: 22px; font-weight: 700; color: var(--text-primary); margin-top: 4px; line-height: 1.2; }
 .home-hero-date { font-size: 11.5px; font-family: var(--font-mono); color: var(--text-secondary); margin-top: 6px; }
- 
+
 .home-section { padding: 16px 16px 0; }
 .home-section-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); margin-bottom: 10px; }
- 
+
 .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .stat-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 10px; text-align: center; }
 .stat-val { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--text-primary); }
@@ -530,13 +529,13 @@ a { color: inherit; text-decoration: none; }
 .stat-val.red { color: var(--danger); }
 .stat-val.blue { color: var(--info); }
 .stat-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); margin-top: 2px; }
- 
+
 .goal-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; display: flex; flex-direction: column; gap: 14px; }
 .goal-item { display: flex; flex-direction: column; gap: 8px; }
 .goal-label { display: flex; align-items: center; justify-content: space-between; }
 .goal-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
 .goal-stat { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
- 
+
 /* =============================================
    CHECKLIST PAGE
 ============================================= */
@@ -548,7 +547,7 @@ a { color: inherit; text-decoration: none; }
 .overall-prog-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
 .overall-prog-title { font-size: 13px; font-weight: 600; color: var(--text-secondary); }
 .overall-prog-val { font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--accent); }
- 
+
 /* =============================================
    WATCHLIST PAGE
 ============================================= */
@@ -564,7 +563,7 @@ a { color: inherit; text-decoration: none; }
 .watch-card-actions { display: flex; gap: 6px; padding: 10px 14px 14px; flex-wrap: wrap; }
 .watch-card-screenshots { display: flex; gap: 6px; padding: 0 14px 10px; overflow-x: auto; }
 .watch-thumb { width: 52px; height: 52px; border-radius: 8px; object-fit: cover; cursor: pointer; border: 1px solid var(--border); flex-shrink: 0; }
- 
+
 /* =============================================
    JOURNAL PAGE
 ============================================= */
@@ -580,7 +579,7 @@ a { color: inherit; text-decoration: none; }
 .meta-chip { font-size: 11px; color: var(--text-muted); background: var(--bg-3); padding: 3px 8px; border-radius: 20px; }
 .journal-card-actions { display: flex; gap: 8px; padding: 0 14px 14px; align-items: center; }
 .journal-screenshots { display: flex; gap: 6px; overflow-x: auto; padding: 0 14px 10px; }
- 
+
 /* =============================================
    ANALYTICS PAGE
 ============================================= */
@@ -599,7 +598,7 @@ a { color: inherit; text-decoration: none; }
 .model-stat-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
 .goal-setting-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin: 0 16px 12px; }
 .goal-setting-title { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; }
- 
+
 /* =============================================
    STRATEGY PAGE
 ============================================= */
@@ -629,7 +628,7 @@ a { color: inherit; text-decoration: none; }
 .risk-rule-icon { font-size: 18px; flex-shrink: 0; }
 .risk-rule p { font-size: 13px; color: var(--text-secondary); line-height: 1.5; }
 .risk-rule strong { color: var(--text-primary); }
- 
+
 /* =============================================
    SETTINGS PAGE
 ============================================= */
@@ -643,14 +642,14 @@ a { color: inherit; text-decoration: none; }
 .settings-row-sub { font-size: 12px; color: var(--text-muted); }
 .settings-row-right { color: var(--text-muted); flex-shrink: 0; }
 .settings-danger-btn { width: 100%; text-align: left; }
- 
+
 /* =============================================
    RESPONSIVE — TABLET+
 ============================================= */
 @media (min-width: 480px) {
   #app { border-left: 1px solid var(--border); border-right: 1px solid var(--border); box-shadow: var(--shadow-lg); }
 }
- 
+
 /* =============================================
    UTILITIES
 ============================================= */
@@ -671,22 +670,22 @@ a { color: inherit; text-decoration: none; }
 .divider { height: 1px; background: var(--border); margin: 12px 0; }
 .fw-7 { font-weight: 700; }
 .line-through { text-decoration: line-through; }
- 
+
 /* SKELETON LOADER */
 .skeleton { background: var(--skeleton); background-size: 200% 100%; border-radius: 6px; animation: shimmer 1.4s ease infinite; }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
- 
+
 /* CHIP FILTER */
 .chip-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
 .chip-row::-webkit-scrollbar { display: none; }
 .chip { padding: 6px 13px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); color: var(--text-muted); background: var(--card-bg); white-space: nowrap; cursor: pointer; transition: all var(--t-fast); }
 .chip.active, .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
- 
+
 /* DIRECTION DOT */
 .dir-dot { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; font-size: 10px; font-weight: 700; }
 .dir-dot.buy { background: rgba(0,230,118,0.15); color: var(--buy); }
 .dir-dot.sell { background: rgba(255,71,87,0.15); color: var(--sell); }
- 
+
 /* =============================================
    FLOATING ACTION BUTTON (Home)
 ============================================= */
@@ -714,7 +713,7 @@ a { color: inherit; text-decoration: none; }
   transform: scale(0.95);
   box-shadow: 0 2px 10px rgba(0,230,118,0.3);
 }
- 
+
 /* =============================================
    HOME — Compact non-scrollable layout
 ============================================= */
@@ -724,7 +723,7 @@ a { color: inherit; text-decoration: none; }
   height: calc(100dvh - var(--top-bar-h) - var(--bottom-nav-h) - var(--safe-bottom));
   box-sizing: border-box; overflow: hidden;
 }
- 
+
 .home-hero-compact {
   display: flex; align-items: center; justify-content: space-between;
   background: var(--card-bg); border: 1px solid var(--border);
@@ -734,7 +733,7 @@ a { color: inherit; text-decoration: none; }
 .home-hero-left { display: flex; flex-direction: column; gap: 3px; }
 .home-hero-greeting { font-size: 13px; font-weight: 600; color: var(--text-primary); }
 .home-hero-date { font-size: 11px; color: var(--text-muted); }
- 
+
 .home-winrate-badge {
   display: flex; flex-direction: column; align-items: center;
   background: var(--bg-3); border-radius: 12px; padding: 8px 16px;
@@ -746,7 +745,7 @@ a { color: inherit; text-decoration: none; }
 .home-winrate-badge.green .home-winrate-val { color: var(--accent); }
 .home-winrate-badge.red   .home-winrate-val { color: var(--danger); }
 .home-winrate-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-top: 2px; }
- 
+
 .home-stats-grid {
   display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; flex-shrink: 0;
 }
@@ -763,7 +762,7 @@ a { color: inherit; text-decoration: none; }
 .home-stat-val.danger { color: var(--danger); }
 .home-stat-val.blue   { color: var(--info); }
 .home-stat-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
- 
+
 .home-goals-card {
   background: var(--card-bg); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 14px 16px;
@@ -777,30 +776,30 @@ a { color: inherit; text-decoration: none; }
 .home-goal-val  { font-size: 12px; font-family: var(--font-mono); font-weight: 600; color: var(--text-primary); }
 .home-prog-track { height: 7px; background: var(--bg-4); border-radius: 7px; overflow: hidden; }
 .hpb-fill { height: 100%; border-radius: 7px; transition: width 0.9s cubic-bezier(0.4,0,0.2,1); width: 0%; }
- 
+
 /* =============================================
    INPUT MODAL
 ============================================= */
 .input-modal-box { padding: 24px 20px 20px; }
 .input-modal-body { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; }
- 
+
 /* =============================================
    HOME — compact goals override
 ============================================= */
 .home-goals-card { flex: unset; }
 .home-goals-list { justify-content: unset; }
- 
+
 /* =============================================
    WATCHLIST — group count colour states
 ============================================= */
 .group-count-none  { color: var(--danger) !important; font-weight: 700; }
 .group-count-some  { color: var(--accent) !important; font-weight: 700; }
- 
+
 /* Hide number input spinners inside modals */
 #input-modal input[type="number"]::-webkit-inner-spin-button,
 #input-modal input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 #input-modal input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
- 
+
 /* =============================================
    JOURNAL SUMMARY BAR
 ============================================= */
@@ -829,14 +828,14 @@ a { color: inherit; text-decoration: none; }
 .jnl-sum-divider {
   width: 1px; background: var(--border); margin: 8px 0;
 }
- 
+
 /* =============================================
    ANALYTICS — remove goal target spinners
 ============================================= */
 .goal-target::-webkit-inner-spin-button,
 .goal-target::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .goal-target { -moz-appearance: textfield; appearance: textfield; }
- 
+
 /* =============================================
    TRADING CALENDAR
 ============================================= */
@@ -847,7 +846,7 @@ a { color: inherit; text-decoration: none; }
   margin: 0 16px 12px;
   overflow: hidden;
 }
- 
+
 /* Header: prev | month name + stats | next */
 .cal-header {
   display: flex;
@@ -872,7 +871,7 @@ a { color: inherit; text-decoration: none; }
 .cal-month-info { display: flex; flex-direction: column; align-items: center; gap: 3px; }
 .cal-month-name { font-size: 15px; font-weight: 700; color: var(--text-primary); }
 .cal-month-stats { display: flex; align-items: center; }
- 
+
 /* Day-of-week header row */
 .cal-grid-header {
   display: grid;
@@ -889,7 +888,7 @@ a { color: inherit; text-decoration: none; }
   color: var(--text-muted);
   padding: 4px 0;
 }
- 
+
 /* Day cells grid */
 .cal-grid {
   display: grid;
@@ -897,7 +896,7 @@ a { color: inherit; text-decoration: none; }
   padding: 4px 8px 8px;
   gap: 3px;
 }
- 
+
 .cal-cell {
   border-radius: 8px;
   min-height: 62px;
@@ -916,10 +915,10 @@ a { color: inherit; text-decoration: none; }
   min-height: 62px;
 }
 .cal-today { border-color: var(--accent) !important; }
- 
+
 .cal-win  { background: rgba(0,230,118,0.13); border-color: rgba(0,230,118,0.25); }
 .cal-loss { background: rgba(255,71,87,0.13);  border-color: rgba(255,71,87,0.25);  }
- 
+
 .cal-day-num {
   font-size: 11px;
   font-weight: 700;
@@ -933,7 +932,7 @@ a { color: inherit; text-decoration: none; }
 }
 .cal-win  .cal-day-num { color: rgba(0,230,118,0.8); }
 .cal-loss .cal-day-num { color: rgba(255,71,87,0.8);  }
- 
+
 .cal-pnl {
   font-family: var(--font-mono);
   font-size: 10.5px;
@@ -944,7 +943,7 @@ a { color: inherit; text-decoration: none; }
 }
 .cal-win  .cal-pnl { color: #00e676; }
 .cal-loss .cal-pnl { color: #ff4757; }
- 
+
 .cal-trades {
   font-size: 9px;
   color: var(--text-muted);
@@ -962,7 +961,7 @@ a { color: inherit; text-decoration: none; }
 }
 .cal-win  .cal-wr { color: rgba(0,230,118,0.7); }
 .cal-loss .cal-wr { color: rgba(255,71,87,0.7);  }
- 
+
 /* Legend */
 .cal-legend {
   display: flex;
@@ -980,7 +979,81 @@ a { color: inherit; text-decoration: none; }
 }
 .cal-legend-dot.win  { background: rgba(0,230,118,0.5);  border: 1px solid rgba(0,230,118,0.6); }
 .cal-legend-dot.loss { background: rgba(255,71,87,0.5);   border: 1px solid rgba(255,71,87,0.6);  }
- 
+
+/* =============================================
+   ANALYTICS — Compact KPI strip
+============================================= */
+.kpi-strip {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.kpi-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 4px;
+  gap: 3px;
+}
+.kpi-val {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.kpi-val.kpi-green { color: var(--accent); }
+.kpi-val.kpi-red   { color: var(--danger); }
+.kpi-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+}
+.kpi-sep {
+  width: 1px;
+  height: 36px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* =============================================
+   CALENDAR — Inline win/loss ratio bar
+============================================= */
+.cal-ratio-row {
+  padding: 8px 14px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cal-ratio-bar-wrap {
+  display: flex;
+  height: 6px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-4);
+  gap: 1px;
+}
+.cal-ratio-bar-win  { background: var(--accent); border-radius: 6px 0 0 6px; transition: flex 0.6s ease; }
+.cal-ratio-bar-loss { background: var(--danger);  border-radius: 0 6px 6px 0; transition: flex 0.6s ease; }
+.cal-ratio-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.cal-ratio-labels span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
 </style>
 </head>
 <body>
@@ -1018,7 +1091,7 @@ a { color: inherit; text-decoration: none; }
     </div>
   </div>
 </div>
- 
+
 <!-- INPUT MODAL (generic form) -->
 <div id="input-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-box input-modal-box">
@@ -1030,7 +1103,7 @@ a { color: inherit; text-decoration: none; }
     </div>
   </div>
 </div>
- 
+
 <!-- CONFIRM MODAL -->
 <div id="confirm-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-box confirm-modal-box">
@@ -1049,7 +1122,7 @@ a { color: inherit; text-decoration: none; }
     </div>
   </div>
 </div>
- 
+
 <!-- IMAGE VIEWER MODAL -->
 <div id="img-viewer-modal" class="modal-overlay hidden img-viewer-overlay" role="dialog">
   <div class="img-viewer-box">
@@ -1059,10 +1132,10 @@ a { color: inherit; text-decoration: none; }
     <img id="img-viewer-src" src="" alt="Screenshot" class="img-viewer-img" />
   </div>
 </div>
- 
+
 <!-- TOAST CONTAINER -->
 <div id="toast-container" role="status" aria-live="polite"></div>
- 
+
 <!-- APP SHELL -->
 <div id="app">
   <!-- TOP BAR -->
@@ -1085,7 +1158,7 @@ a { color: inherit; text-decoration: none; }
       </button>
     </div>
   </header>
- 
+
   <!-- SEARCH PANEL -->
   <div id="search-panel" class="search-panel hidden">
     <div class="search-panel-inner">
@@ -1099,7 +1172,7 @@ a { color: inherit; text-decoration: none; }
       <div id="search-results" class="search-results"></div>
     </div>
   </div>
- 
+
   <!-- MAIN CONTENT -->
   <main id="main-content" class="main-content">
     <div id="page-home" class="page active"></div>
@@ -1110,7 +1183,7 @@ a { color: inherit; text-decoration: none; }
     <div id="page-strategy" class="page"></div>
     <div id="page-settings" class="page"></div>
   </main>
- 
+
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" id="bottom-nav" role="navigation" aria-label="Main navigation">
     <button class="nav-btn active" data-page="home" aria-label="Home">
@@ -1139,7 +1212,7 @@ a { color: inherit; text-decoration: none; }
     </button>
   </nav>
 </div>
- 
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
@@ -1149,9 +1222,9 @@ a { color: inherit; text-decoration: none; }
 ============================================ */
 const DB_NAME = 'TradeJournalDB';
 const DB_VER  = 3;
- 
+
 let _db = null;
- 
+
 const DB = {
   async open() {
     if (_db) return _db;
@@ -1180,7 +1253,7 @@ const DB = {
       req.onerror = e => rej(e.target.error);
     });
   },
- 
+
   async _tx(store, mode, fn) {
     const db = await this.open();
     return new Promise((res, rej) => {
@@ -1196,7 +1269,7 @@ const DB = {
       }
     });
   },
- 
+
   /* ---------- SETTINGS ---------- */
   async getSetting(key, fallback = null) {
     try {
@@ -1209,7 +1282,7 @@ const DB = {
       });
     } catch { return fallback; }
   },
- 
+
   async setSetting(key, value) {
     const db = await this.open();
     return new Promise((res, rej) => {
@@ -1219,7 +1292,7 @@ const DB = {
       req.onerror = e => rej(e.target.error);
     });
   },
- 
+
   /* ---------- SETUPS (checklist / watchlist) ---------- */
   async saveSetup(setup) {
     if (!setup.id) setup.id = crypto.randomUUID();
@@ -1233,7 +1306,7 @@ const DB = {
       req.onerror = e => rej(e.target.error);
     });
   },
- 
+
   async getSetup(id) {
     const db = await this.open();
     return new Promise((res, rej) => {
@@ -1243,7 +1316,7 @@ const DB = {
       req.onerror = e => rej(e.target.error);
     });
   },
- 
+
   async getAllSetups() {
     const db = await this.open();
     return new Promise((res, rej) => {
@@ -1253,7 +1326,7 @@ const DB = {
       req.onerror = e => rej(e.target.error);
     });
   },
- 
+
   async deleteSetup(id) {
     const db = await this.open();
     return new Promise((res, rej) => {
@@ -1263,7 +1336,7 @@ const DB = {
       req.onerror = e => rej(e.target.error);
     });
   },
- 
+
   /* ---------- JOURNAL ---------- */
   async saveJournalEntry(entry) {
     if (!entry.id) entry.id = crypto.randomUUID();
@@ -1277,7 +1350,7 @@ const DB = {
       req.onerror = e => rej(e.target.error);
     });
   },
- 
+
   async getJournalEntry(id) {
     const db = await this.open();
     return new Promise((res, rej) => {
@@ -1287,7 +1360,7 @@ const DB = {
       req.onerror = e => rej(e.target.error);
     });
   },
- 
+
   async getAllJournal() {
     const db = await this.open();
     return new Promise((res, rej) => {
@@ -1297,7 +1370,7 @@ const DB = {
       req.onerror = e => rej(e.target.error);
     });
   },
- 
+
   async deleteJournalEntry(id) {
     const db = await this.open();
     return new Promise((res, rej) => {
@@ -1307,7 +1380,7 @@ const DB = {
       req.onerror = e => rej(e.target.error);
     });
   },
- 
+
   /* ---------- BACKUP / RESTORE ---------- */
   async exportAll() {
     const [setups, journal, db] = await Promise.all([
@@ -1323,18 +1396,18 @@ const DB = {
     });
     return { version: 1, exportedAt: Date.now(), setups, journal, settings };
   },
- 
+
   async importAll(data) {
     if (!data || data.version !== 1) throw new Error('Invalid backup format');
     const db = await this.open();
- 
+
     const clearStore = (name) => new Promise((res, rej) => {
       const tx = db.transaction(name, 'readwrite');
       const req = tx.objectStore(name).clear();
       req.onsuccess = () => res();
       req.onerror = e => rej(e.target.error);
     });
- 
+
     const putAll = (name, items) => new Promise((res, rej) => {
       const tx = db.transaction(name, 'readwrite');
       const store = tx.objectStore(name);
@@ -1342,7 +1415,7 @@ const DB = {
       tx.oncomplete = () => res();
       tx.onerror = e => rej(e.target.error);
     });
- 
+
     await clearStore('setups');
     await clearStore('journal');
     await clearStore('settings');
@@ -1350,7 +1423,7 @@ const DB = {
     if (data.journal?.length)  await putAll('journal',  data.journal);
     if (data.settings?.length) await putAll('settings', data.settings);
   },
- 
+
   /* ---------- ANALYTICS HELPERS ---------- */
   async getAnalytics() {
     const entries = await this.getAllJournal();
@@ -1359,7 +1432,7 @@ const DB = {
     const losses= entries.filter(e => e.status === 'loss').length;
     const pending= entries.filter(e => e.status === 'pending').length;
     const winRate = total > 0 ? Math.round((wins / (wins + losses || 1)) * 100) : 0;
- 
+
     const byModel = { 'V-Shape Recovery': {w:0,l:0}, 'Order Block': {w:0,l:0}, 'iFVG': {w:0,l:0}, 'iFVG Mitigation': {w:0,l:0} };
     entries.forEach(e => {
       const m = byModel[e.setupType];
@@ -1367,7 +1440,7 @@ const DB = {
       if (e.status === 'profit') m.w++;
       if (e.status === 'loss')   m.l++;
     });
- 
+
     // Monthly buckets
     const monthly = {};
     entries.forEach(e => {
@@ -1378,13 +1451,13 @@ const DB = {
       if (e.status === 'profit') monthly[key].w++;
       if (e.status === 'loss')   monthly[key].l++;
     });
- 
+
     return { total, wins, losses, pending, winRate, byModel, monthly };
   }
 };
- 
+
 window.DB = DB;
- 
+
 /* ============================================
    HOME PAGE — Compact non-scrollable dashboard
 ============================================ */
@@ -1396,17 +1469,17 @@ const HomePage = {
       DB.getSetting('goals', { weekly:{target:5,metric:'wins'}, monthly:{target:20,metric:'wins'}, yearly:{target:200,metric:'wins'} }),
       DB.getAllSetups()
     ]);
- 
+
     const openTrades = setups.filter(s => ['watching','ready','taken'].includes(s.status)).length;
     const now = new Date();
     const dateStr = now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
     const wProg = this._goalProgress('weekly',  goals, analytics);
     const mProg = this._goalProgress('monthly', goals, analytics);
     const yProg = this._goalProgress('yearly',  goals, analytics);
- 
+
     el.innerHTML = `
       <div class="home-layout">
- 
+
         <!-- Hero strip -->
         <div class="home-hero-compact">
           <div class="home-hero-left">
@@ -1418,7 +1491,7 @@ const HomePage = {
             <span class="home-winrate-lbl">Win Rate</span>
           </div>
         </div>
- 
+
         <!-- Stats grid -->
         <div class="home-stats-grid">
           <div class="home-stat-tile">
@@ -1438,7 +1511,7 @@ const HomePage = {
             <span class="home-stat-lbl">Open</span>
           </div>
         </div>
- 
+
         <!-- Goals (compact) -->
         <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;">
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:10px;">Goal Progress</div>
@@ -1448,35 +1521,35 @@ const HomePage = {
             ${this._goalRow('Yearly',  yProg, goals.yearly)}
           </div>
         </div>
- 
+
       </div>
     `;
- 
+
     // Animate bars after paint
     requestAnimationFrame(() => {
       el.querySelectorAll('.hpb-fill[data-w]').forEach(b => {
         b.style.width = b.dataset.w + '%';
       });
     });
- 
+
     // Remove FAB if it exists from a previous version
     document.getElementById('home-fab')?.remove();
   },
- 
+
   _greeting() {
     const h = new Date().getHours();
     if (h < 12) return 'Good morning, Trader';
     if (h < 17) return 'Good afternoon, Trader';
     return 'Good evening, Trader';
   },
- 
+
   _goalProgress(period, goals, analytics) {
     const g = goals[period];
     if (!g || !g.target) return 0;
     const current = g.metric === 'wins' ? analytics.wins : analytics.total;
     return Math.min(100, Math.round((current / g.target) * 100));
   },
- 
+
   _goalRow(label, pct, goal) {
     if (!goal) return '';
     const barColor = pct >= 100 ? 'var(--accent)' : pct >= 60 ? 'var(--accent)' : pct >= 30 ? 'var(--warning)' : 'var(--danger)';
@@ -1493,13 +1566,13 @@ const HomePage = {
     `;
   }
 };
- 
+
 window.HomePage = HomePage;
- 
+
 /* ============================================
    CHECKLIST PAGE
 ============================================ */
- 
+
 const COLLAPSED_BY_DEFAULT = new Set([
   'Session',
   'Entry_Model_1_V_Shape_Recovery',
@@ -1507,7 +1580,7 @@ const COLLAPSED_BY_DEFAULT = new Set([
   'Entry_Model_3_iFVG_Entry',
   'Entry_Model_4_iFVG_Mitigation_Rejection',
 ]);
- 
+
 const CHECKLIST_ITEMS = [
   {
     group: 'Session',
@@ -1580,26 +1653,26 @@ const CHECKLIST_ITEMS = [
     ]
   },
 ];
- 
+
 const ChecklistPage = {
   _current: null,
- 
+
   async render() {
     const el = document.getElementById('page-checklist');
     if (!this._current) this._current = this._newSetup();
     el.innerHTML = this._buildPage();
     this._bindEvents(el);
   },
- 
+
   _newSetup() {
     return { id: null, pair: 'NAS100', direction: 'buy', setupType: '',
              notes: '', checks: {}, screenshots: [], status: 'checklist', createdAt: null };
   },
- 
+
   _groupKey(name) {
     return name.replace(/[\s\/\+\u2014\-]+/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
   },
- 
+
   _buildPage() {
     const s = this._current;
     return `
@@ -1610,7 +1683,7 @@ const ChecklistPage = {
         </div>
         <button class="btn btn-ghost btn-sm" id="cl-reset-btn">Reset</button>
       </div>
- 
+
       <div class="checklist-setup-card">
         <div class="form-row">
           <div class="form-group">
@@ -1632,9 +1705,9 @@ const ChecklistPage = {
           </div>
         </div>
       </div>
- 
+
       ${CHECKLIST_ITEMS.map(g => this._buildGroup(g, s.checks)).join('')}
- 
+
       <div class="checklist-actions">
         ${s.id ? `<button class="btn btn-ghost btn-full" id="cl-update-btn">Update Setup</button>` : ''}
         <button class="btn btn-primary btn-full" id="cl-watchlist-btn">
@@ -1648,7 +1721,7 @@ const ChecklistPage = {
       <div style="height:16px;"></div>
     `;
   },
- 
+
   _buildGroup(group, checks) {
     const key       = this._groupKey(group.group);
     const collapsed = COLLAPSED_BY_DEFAULT.has(key) ? 'collapsed' : '';
@@ -1674,7 +1747,7 @@ const ChecklistPage = {
       </div>
     `;
   },
- 
+
   _buildCheckItem(item, checked) {
     return `
       <div class="check-item ${checked ? 'checked' : ''}" data-check-id="${item.id}">
@@ -1690,11 +1763,11 @@ const ChecklistPage = {
       </div>
     `;
   },
- 
- 
+
+
   _bindEvents(el) {
     const s = this._current;
- 
+
     const autoSave = () => {
       s.pair      = el.querySelector('#cl-pair').value;
       s.direction = el.querySelector('#cl-dir').value;
@@ -1702,13 +1775,13 @@ const ChecklistPage = {
     ['#cl-pair','#cl-dir'].forEach(sel => {
       el.querySelector(sel)?.addEventListener('change', autoSave);
     });
- 
+
     el.querySelectorAll('[data-group-toggle]').forEach(hdr => {
       hdr.addEventListener('click', () => {
         hdr.closest('.checklist-group')?.classList.toggle('collapsed');
       });
     });
- 
+
     el.querySelectorAll('.check-item').forEach(item => {
       item.addEventListener('click', () => {
         const id = item.dataset.checkId;
@@ -1717,8 +1790,8 @@ const ChecklistPage = {
         this._updateGroupCounts(el);
       });
     });
- 
- 
+
+
     el.querySelector('#cl-watchlist-btn')?.addEventListener('click', async () => {
       autoSave();
       if (!s.pair) { App.toast('Select an asset first', 'error'); return; }
@@ -1728,13 +1801,13 @@ const ChecklistPage = {
       this._current = this._newSetup();
       App.navigate('watchlist');
     });
- 
+
     el.querySelector('#cl-update-btn')?.addEventListener('click', async () => {
       autoSave();
       await DB.saveSetup(s);
       App.toast('Setup updated', 'success');
     });
- 
+
     el.querySelector('#cl-reset-btn')?.addEventListener('click', () => {
       App.confirm('Reset checklist?', 'All entered data will be cleared.', () => {
         this._current = this._newSetup();
@@ -1742,7 +1815,7 @@ const ChecklistPage = {
       });
     });
   },
- 
+
   _updateGroupCounts(el) {
     CHECKLIST_ITEMS.forEach(g => {
       const key     = this._groupKey(g.group);
@@ -1751,32 +1824,32 @@ const ChecklistPage = {
       if (progEl) progEl.textContent = `${checked}/${g.items.length}`;
     });
   },
- 
- 
- 
+
+
+
   loadSetup(setup) {
     this._current = JSON.parse(JSON.stringify(setup));
     this.render();
   },
 };
- 
+
 window.ChecklistPage = ChecklistPage;
 window.CHECKLIST_ITEMS = CHECKLIST_ITEMS;
- 
+
 /* ============================================
    WATCHLIST PAGE
 ============================================ */
 const WatchlistPage = {
   _filter: 'all',
   _expandedId: null,
- 
+
   async render() {
     const el = document.getElementById('page-watchlist');
     const [setups, allJournal] = await Promise.all([DB.getAllSetups(), DB.getAllJournal()]);
- 
+
     // Only show 'watching' — taken items disappear from watchlist
     const active = setups.filter(s => s.status === 'watching');
- 
+
     const todayStart = new Date(); todayStart.setHours(0,0,0,0);
     const todayEnd   = new Date(); todayEnd.setHours(23,59,59,999);
     const todayCount = allJournal.filter(e =>
@@ -1786,7 +1859,7 @@ const WatchlistPage = {
     ).length;
     const limitReached = todayCount >= 2;
     const dailyColor   = limitReached ? 'var(--danger)' : todayCount === 1 ? 'var(--warning)' : 'var(--accent)';
- 
+
     el.innerHTML = `
       <div class="section-header">
         <div>
@@ -1798,29 +1871,29 @@ const WatchlistPage = {
           <span style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-muted);">Today</span>
         </div>
       </div>
- 
+
       <div style="padding:0 16px 12px;">
         <div class="chip-row" id="wl-filter-row">
           <button class="chip ${this._filter==='all'?'active':''}"         data-filter="all">All</button>
           <button class="chip ${this._filter==='watching'?'active':''}"    data-filter="watching">Watching</button>
         </div>
       </div>
- 
+
       <div class="watch-list" id="wl-list"></div>
     `;
- 
+
     el.querySelector('#wl-filter-row').addEventListener('click', e => {
       const chip = e.target.closest('[data-filter]');
       if (chip) { this._filter = chip.dataset.filter; this.render(); }
     });
- 
+
     this._renderCards(el, active, limitReached);
   },
- 
+
   _renderCards(el, setups, limitReached) {
     const list = el.querySelector('#wl-list');
     const filtered = this._filter === 'all' ? setups : setups.filter(s => s.status === this._filter);
- 
+
     if (!filtered.length) {
       list.innerHTML = `
         <div class="empty-state">
@@ -1835,32 +1908,32 @@ const WatchlistPage = {
         </div>`;
       return;
     }
- 
+
     list.innerHTML = filtered
       .sort((a, b) => (b.updatedAt||b.createdAt) - (a.updatedAt||a.createdAt))
       .map(s => this._renderCard(s, limitReached)).join('');
- 
+
     filtered.forEach(setup => {
       const id = setup.id;
- 
+
       list.querySelectorAll(`[data-card-id="${id}"] [data-view-img]`).forEach(img => {
         img.addEventListener('click', e => { e.stopPropagation(); App.showImage(img.dataset.viewImg); });
       });
- 
+
       list.querySelector(`[data-edit-id="${id}"]`)?.addEventListener('click', () => {
         this._expandedId = this._expandedId === id ? null : id;
         this._renderCards(el, setup._parentList || filtered, limitReached);
       });
- 
+
       list.querySelector(`[data-take-id="${id}"]`)?.addEventListener('click', () => {
         if (limitReached) { App.toast('🚫 Daily limit: max 2 trades per day', 'error'); return; }
         this._showTakeModal(setup, el, filtered, limitReached);
       });
- 
+
       list.querySelector(`[data-inv-id="${id}"]`)?.addEventListener('click', () => {
         this._showInvalidateModal(setup);
       });
- 
+
       list.querySelector(`[data-del-id="${id}"]`)?.addEventListener('click', () => {
         App.confirm('Delete this setup?', 'This action cannot be undone.', async () => {
           await DB.deleteSetup(id);
@@ -1869,7 +1942,7 @@ const WatchlistPage = {
           this.render();
         });
       });
- 
+
       // Edit panel save/cancel
       list.querySelector(`[data-ep-save="${id}"]`)?.addEventListener('click', async () => {
         const panel = list.querySelector(`[data-edit-panel="${id}"]`);
@@ -1885,12 +1958,12 @@ const WatchlistPage = {
         this._expandedId = null;
         this.render();
       });
- 
+
       list.querySelector(`[data-ep-cancel="${id}"]`)?.addEventListener('click', () => {
         this._expandedId = null;
         this.render();
       });
- 
+
       // Inline checklist items
       list.querySelectorAll(`[data-edit-panel="${id}"] .check-item`).forEach(item => {
         item.addEventListener('click', () => {
@@ -1903,7 +1976,7 @@ const WatchlistPage = {
       });
     });
   },
- 
+
   _renderCard(s, limitReached) {
     const totalItems = CHECKLIST_ITEMS.reduce((n, g) => n + g.items.length, 0);
     const checked    = Object.values(s.checks || {}).filter(Boolean).length;
@@ -1916,7 +1989,7 @@ const WatchlistPage = {
       .join('');
     const canAct     = s.status === 'watching';
     const isExpanded = this._expandedId === s.id;
- 
+
     return `
       <div class="watch-card" data-card-id="${s.id}">
         <div class="watch-card-header">
@@ -1952,7 +2025,7 @@ const WatchlistPage = {
             </svg>
           </button>
         </div>
- 
+
         ${isExpanded ? `
         <div data-edit-panel="${s.id}" style="border-top:1px solid var(--border);padding:14px 14px 10px;">
           <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);margin-bottom:8px;">Checklist Progress</div>
@@ -1978,7 +2051,7 @@ const WatchlistPage = {
               </details>
             `;
           }).join('')}
- 
+
           <div style="display:flex;gap:8px;margin-top:12px;">
             <button class="btn btn-ghost btn-sm" data-ep-cancel="${s.id}" style="flex:1;">Cancel</button>
             <button class="btn btn-primary btn-sm" data-ep-save="${s.id}" style="flex:1;">Save Changes</button>
@@ -1988,7 +2061,7 @@ const WatchlistPage = {
       </div>
     `;
   },
- 
+
   _refreshGroupCounts(list, setupId, setup) {
     const panel = list.querySelector(`[data-edit-panel="${setupId}"]`);
     if (!panel) return;
@@ -1999,7 +2072,7 @@ const WatchlistPage = {
       if (el) { el.textContent = `${gc}/${g.items.length}`; el.className = cls; }
     });
   },
- 
+
   _showTakeModal(setup, el) {
     // Build a rich custom modal
     const modal = document.getElementById('input-modal');
@@ -2007,9 +2080,9 @@ const WatchlistPage = {
     const bodyEl  = document.getElementById('input-modal-body');
     const okBtn   = document.getElementById('input-modal-ok');
     const cancelBtn = document.getElementById('input-modal-cancel');
- 
+
     titleEl.textContent = '📋 Place Trade';
- 
+
     bodyEl.innerHTML = `
       <!-- Entry Model -->
       <div class="form-group">
@@ -2022,7 +2095,7 @@ const WatchlistPage = {
           <option value="iFVG Mitigation">Model 4 — iFVG Mitigation + Rejection</option>
         </select>
       </div>
- 
+
       <!-- Risk Management -->
       <div style="margin-top:4px;">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:var(--text-muted);margin-bottom:8px;">🛡️ Risk Management</div>
@@ -2047,7 +2120,7 @@ const WatchlistPage = {
           </div>
         </div>
       </div>
- 
+
       <!-- Lot Size -->
       <div class="form-group">
         <label class="form-label">Lot Size <span style="color:var(--danger)">*</span></label>
@@ -2056,19 +2129,19 @@ const WatchlistPage = {
           style="appearance:textfield;-moz-appearance:textfield;-webkit-appearance:none;" />
       </div>
     `;
- 
+
     modal.classList.remove('hidden');
- 
+
     // Bind checklist items in modal
     bodyEl.querySelectorAll('.check-item[data-tm-check]').forEach(item => {
       item.addEventListener('click', () => item.classList.toggle('checked'));
     });
- 
+
     const newOk = okBtn.cloneNode(true);
     okBtn.parentNode.replaceChild(newOk, okBtn);
     const newCancel = cancelBtn.cloneNode(true);
     cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
- 
+
     newCancel.addEventListener('click', () => App._closeInputModal());
     newOk.addEventListener('click', async () => {
       const model = bodyEl.querySelector('#tm-model').value;
@@ -2079,7 +2152,7 @@ const WatchlistPage = {
       await this._markTaken(setup, model, parseFloat(lots));
     });
   },
- 
+
   async _markTaken(setup, entryModel, lotSize) {
     const todayStart = new Date(); todayStart.setHours(0,0,0,0);
     const todayEnd   = new Date(); todayEnd.setHours(23,59,59,999);
@@ -2090,10 +2163,10 @@ const WatchlistPage = {
       e.status !== 'invalidated'
     );
     if (todayTrades.length >= 2) { App.toast('🚫 Daily limit reached', 'error'); return; }
- 
+
     // Remove from watchlist (delete the setup)
     await DB.deleteSetup(setup.id);
- 
+
     // Create journal entry with entry model + lot size
     await DB.saveJournalEntry({
       id:          crypto.randomUUID(),
@@ -2111,19 +2184,19 @@ const WatchlistPage = {
       createdAt:   Date.now(),
       updatedAt:   Date.now()
     });
- 
+
     App.toast(`Trade recorded — ${entryModel} @ ${lotSize} lots`, 'success');
     this._expandedId = null;
     this.render();
   },
- 
+
   _showInvalidateModal(setup) {
     const modal    = document.getElementById('input-modal');
     const titleEl  = document.getElementById('input-modal-title');
     const bodyEl   = document.getElementById('input-modal-body');
     const okBtn    = document.getElementById('input-modal-ok');
     const cancelBtn = document.getElementById('input-modal-cancel');
- 
+
     titleEl.textContent = '✕ Close Setup';
     bodyEl.innerHTML = `
       <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:4px;">
@@ -2144,24 +2217,24 @@ const WatchlistPage = {
           style="appearance:textfield;-moz-appearance:textfield;-webkit-appearance:none;" />
       </div>
     `;
- 
+
     modal.classList.remove('hidden');
- 
+
     const outcomeEl  = bodyEl.querySelector('#inv-outcome');
     const amtWrap    = bodyEl.querySelector('#inv-amount-wrap');
     const amtLabel   = bodyEl.querySelector('#inv-amount-label');
- 
+
     outcomeEl.addEventListener('change', () => {
       const v = outcomeEl.value;
       amtWrap.style.display = (v === 'profit' || v === 'loss') ? 'block' : 'none';
       amtLabel.textContent  = v === 'profit' ? 'Profit Amount ($ / pips / R)' : 'Loss Amount ($ / pips / R)';
     });
- 
+
     const newOk     = okBtn.cloneNode(true);
     const newCancel = cancelBtn.cloneNode(true);
     okBtn.parentNode.replaceChild(newOk, okBtn);
     cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
- 
+
     newCancel.addEventListener('click', () => App._closeInputModal());
     newOk.addEventListener('click', async () => {
       const outcome = outcomeEl.value;
@@ -2170,19 +2243,19 @@ const WatchlistPage = {
       await this._closeSetup(setup, outcome, amount);
     });
   },
- 
+
   async _closeSetup(setup, outcome, amount) {
     // Remove from watchlist entirely
     await DB.deleteSetup(setup.id);
- 
+
     const journalStatus =
       outcome === 'profit' ? 'profit' :
       outcome === 'loss'   ? 'loss'   : 'pending';
- 
+
     const closedLabel =
       outcome === 'not_taken' ? 'Not Taken' :
       outcome === 'profit'    ? 'Win'        : 'Loss';
- 
+
     await DB.saveJournalEntry({
       id:           crypto.randomUUID(),
       setupId:      setup.id,
@@ -2199,7 +2272,7 @@ const WatchlistPage = {
       createdAt:    Date.now(),
       updatedAt:    Date.now()
     });
- 
+
     const msg  = outcome === 'not_taken' ? 'Setup closed — Not Taken'
                : outcome === 'profit'    ? 'Win recorded 🎉'
                :                          'Loss recorded';
@@ -2208,19 +2281,19 @@ const WatchlistPage = {
     this.render();
   },
 };
- 
+
 window.WatchlistPage = WatchlistPage;
- 
+
 /* ============================================
    JOURNAL PAGE
 ============================================ */
 const JournalPage = {
   _filters: { status:'all', direction:'all', setupType:'all', search:'', day:'' },
- 
+
   async render() {
     const el = document.getElementById('page-journal');
     const entries = await DB.getAllJournal();
- 
+
     el.innerHTML = `
       <div class="section-header">
         <div>
@@ -2233,7 +2306,7 @@ const JournalPage = {
           </svg> CSV
         </button>
       </div>
- 
+
       <div class="journal-filters">
         <div style="position:relative;">
           <svg style="position:absolute;left:12px;top:50%;transform:translateY(-50%);pointer-events:none;" width="15" height="15" viewBox="0 0 24 24" fill="none">
@@ -2273,16 +2346,16 @@ const JournalPage = {
           </div>
         </div>
       </div>
- 
+
       <div class="journal-list" id="jnl-list">
         ${this._renderList(entries)}
       </div>
     `;
- 
+
     this._renderSummaryBar(entries);
     this._bindEvents(el, entries);
   },
- 
+
   _renderList(entries) {
     let filtered = [...entries];
     if (this._filters.status    !== 'all') filtered = filtered.filter(e => e.status    === this._filters.status);
@@ -2302,7 +2375,7 @@ const JournalPage = {
       );
     }
     filtered.sort((a, b) => b.createdAt - a.createdAt);
- 
+
     if (!filtered.length) return `
       <div class="empty-state">
         <div class="empty-icon">
@@ -2314,21 +2387,21 @@ const JournalPage = {
         <div class="empty-title">${entries.length ? 'No matches' : 'No journal entries yet'}</div>
         <div class="empty-desc">${entries.length ? 'Adjust your filters.' : 'Mark a trade as taken from the Watchlist.'}</div>
       </div>`;
- 
+
     return filtered.map(e => this._renderCard(e)).join('');
   },
- 
+
   _renderCard(e) {
     const dateStr   = new Date(e.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
     const dirClass  = e.direction === 'buy' ? 'buy' : 'sell';
     const dirSym    = e.direction === 'sell' ? '▼' : '▲';
     const isClosed  = e.status === 'profit' || e.status === 'loss';
- 
+
     // Setup screenshots (from when trade was taken)
     const setupThumbs = (e.screenshots || []).slice(0,3)
       .map(img => `<img src="${img}" class="watch-thumb" data-view-img="${img}" alt="ss" loading="lazy"/>`)
       .join('');
- 
+
     // Result screenshots (from P&L modal)
     const resultThumbs = [
       ...((isClosed && e.status === 'profit') ? (e.profitScreenshots||[]) : []),
@@ -2336,14 +2409,14 @@ const JournalPage = {
     ].slice(0,3).map(img =>
       `<img src="${img}" class="watch-thumb" data-view-img="${img}" alt="result ss" loading="lazy"/>`
     ).join('');
- 
+
     // P&L amount badge
     const pnlDisplay = e.status === 'profit' && e.profitAmount
       ? `<span style="font-size:12px;font-weight:700;color:var(--accent);font-family:var(--font-mono);">+$${e.profitAmount}</span>`
       : e.status === 'loss' && e.lossAmount
       ? `<span style="font-size:12px;font-weight:700;color:var(--danger);font-family:var(--font-mono);">-$${e.lossAmount}</span>`
       : '';
- 
+
     return `
       <div class="journal-card" data-entry-id="${e.id}">
         <div class="journal-card-header">
@@ -2360,21 +2433,21 @@ const JournalPage = {
             ${e.closedReason ? `<span class="meta-chip">${e.closedReason}</span>` : ''}
           </div>
         </div>
- 
+
         ${setupThumbs ? `
           <div style="padding:0 14px 6px;">
             <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-muted);margin-bottom:5px;">Setup Screenshots</div>
             <div style="display:flex;gap:6px;overflow-x:auto;">${setupThumbs}</div>
           </div>
         ` : ''}
- 
+
         ${resultThumbs ? `
           <div style="padding:0 14px 6px;">
             <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text-muted);margin-bottom:5px;">Result Screenshots</div>
             <div style="display:flex;gap:6px;overflow-x:auto;">${resultThumbs}</div>
           </div>
         ` : ''}
- 
+
         <div class="journal-card-actions">
           <button class="btn btn-sm jnl-profit" data-id="${e.id}"
             ${isClosed ? 'disabled' : ''}
@@ -2397,7 +2470,7 @@ const JournalPage = {
       </div>
     `;
   },
- 
+
   _bindEvents(el, entries) {
     let timer;
     const applyFilters = async () => {
@@ -2410,21 +2483,21 @@ const JournalPage = {
       el.querySelector('#jnl-list').innerHTML = this._renderList(fresh);
       this._bindListButtons(el, fresh);
     };
- 
+
     el.querySelector('#jnl-search')?.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(applyFilters, 250); });
     ['#jnl-status-filter','#jnl-dir-filter','#jnl-type-filter','#jnl-day-filter'].forEach(sel => {
       el.querySelector(sel)?.addEventListener('change', applyFilters);
     });
- 
+
     el.querySelector('#jnl-csv-btn')?.addEventListener('click', () => this._exportCSV(entries));
     this._bindListButtons(el, entries);
   },
- 
+
   _bindListButtons(el, entries) {
     el.querySelectorAll('[data-view-img]').forEach(img => {
       img.addEventListener('click', () => App.showImage(img.dataset.viewImg));
     });
- 
+
     el.querySelectorAll('.jnl-profit').forEach(btn => {
       btn.addEventListener('click', async () => {
         const entry = await DB.getJournalEntry(btn.dataset.id);
@@ -2432,7 +2505,7 @@ const JournalPage = {
         this._showPnlModal('profit', entry);
       });
     });
- 
+
     el.querySelectorAll('.jnl-loss').forEach(btn => {
       btn.addEventListener('click', async () => {
         const entry = await DB.getJournalEntry(btn.dataset.id);
@@ -2440,7 +2513,7 @@ const JournalPage = {
         this._showPnlModal('loss', entry);
       });
     });
- 
+
     el.querySelectorAll('.jnl-delete').forEach(btn => {
       btn.addEventListener('click', () => {
         const id = btn.dataset.id;
@@ -2452,17 +2525,17 @@ const JournalPage = {
       });
     });
   },
- 
+
   _renderSummaryBar(entries) {
     // Remove old bar if exists
     document.getElementById('jnl-summary-bar')?.remove();
- 
+
     const totalWin  = entries.filter(e => e.status === 'profit' && e.profitAmount)
                              .reduce((s, e) => s + parseFloat(e.profitAmount || 0), 0);
     const totalLoss = entries.filter(e => e.status === 'loss' && e.lossAmount)
                              .reduce((s, e) => s + parseFloat(e.lossAmount || 0), 0);
     const netProfit = totalWin - totalLoss;
- 
+
     const bar = document.createElement('div');
     bar.id = 'jnl-summary-bar';
     bar.className = 'jnl-summary-bar';
@@ -2482,14 +2555,14 @@ const JournalPage = {
         <span class="jnl-sum-lbl">Net P&amp;L</span>
       </div>
     `;
- 
+
     // Insert before bottom-nav inside #app
     const app = document.getElementById('app');
     const nav = app.querySelector('.bottom-nav');
     if (nav) app.insertBefore(bar, nav);
     else app.appendChild(bar);
   },
- 
+
   _showPnlModal(type, entry) {
     const isProfit = type === 'profit';
     const modal    = document.getElementById('input-modal');
@@ -2497,14 +2570,14 @@ const JournalPage = {
     const bodyEl   = document.getElementById('input-modal-body');
     const okBtn    = document.getElementById('input-modal-ok');
     const cancelBtn = document.getElementById('input-modal-cancel');
- 
+
     titleEl.textContent = isProfit ? '🎉 Record Profit' : '📉 Record Loss';
     const color = isProfit ? 'var(--accent)' : 'var(--danger)';
     const existingAmt = isProfit ? (entry.profitAmount || '') : (entry.lossAmount || '');
- 
+
     // Temp screenshot storage
     let screenshots = [...(isProfit ? (entry.profitScreenshots||[]) : (entry.lossScreenshots||[]))];
- 
+
     bodyEl.innerHTML = `
       <div class="form-group">
         <label class="form-label">${isProfit ? 'Profit' : 'Loss'} Amount ($ / pips / R) <span style="color:${color}">*</span></label>
@@ -2526,9 +2599,9 @@ const JournalPage = {
         <input type="file" id="pnl-img-input" accept="image/*" multiple style="display:none;" />
       </div>
     `;
- 
+
     modal.classList.remove('hidden');
- 
+
     // Image upload
     bodyEl.querySelector('#pnl-img-input')?.addEventListener('change', async (e) => {
       for (const f of e.target.files) {
@@ -2537,19 +2610,19 @@ const JournalPage = {
       e.target.value = '';
       this._refreshPnlThumbs(bodyEl, screenshots);
     });
- 
+
     bodyEl.querySelector('#pnl-thumb-row')?.addEventListener('click', e => {
       const del = e.target.closest('[data-pnl-del]');
       if (del) { screenshots.splice(parseInt(del.dataset.pnlDel), 1); this._refreshPnlThumbs(bodyEl, screenshots); }
       const img = e.target.closest('img');
       if (img) App.showImage(img.src);
     });
- 
+
     const newOk = okBtn.cloneNode(true);
     okBtn.parentNode.replaceChild(newOk, okBtn);
     const newCancel = cancelBtn.cloneNode(true);
     cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
- 
+
     newCancel.addEventListener('click', () => App._closeInputModal());
     newOk.addEventListener('click', async () => {
       const amt = bodyEl.querySelector('#pnl-amount').value;
@@ -2567,7 +2640,7 @@ const JournalPage = {
       this.render();
     });
   },
- 
+
   _refreshPnlThumbs(bodyEl, screenshots) {
     const row = bodyEl.querySelector('#pnl-thumb-row');
     if (!row) return;
@@ -2581,7 +2654,7 @@ const JournalPage = {
       <label for="pnl-img-input" style="width:52px;height:52px;border-radius:8px;border:2px dashed var(--border-strong);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-muted);font-size:20px;flex-shrink:0;">+</label>
     `;
   },
- 
+
   _fileToBase64(file) {
     return new Promise((res, rej) => {
       const r = new FileReader();
@@ -2590,7 +2663,7 @@ const JournalPage = {
       r.readAsDataURL(file);
     });
   },
- 
+
   _exportCSV(entries) {
     if (!entries.length) { App.toast('No entries to export', 'error'); return; }
     const hdrs = ['ID','Pair','Direction','Entry Model','Status','Lot Size','Profit','Loss','Created At'];
@@ -2608,9 +2681,9 @@ const JournalPage = {
     App.toast('CSV exported', 'success');
   },
 };
- 
+
 window.JournalPage = JournalPage;
- 
+
 /* ============================================
    ANALYTICS PAGE — Performance metrics & charts
 ============================================ */
@@ -2619,7 +2692,7 @@ const AnalyticsPage = {
   _period: 'all',
   _calYear:  new Date().getFullYear(),
   _calMonth: new Date().getMonth(), // 0-indexed
- 
+
   async render() {
     const el = document.getElementById('page-analytics');
     const [analytics, goals, allEntries] = await Promise.all([
@@ -2627,7 +2700,7 @@ const AnalyticsPage = {
       DB.getSetting('goals', { weekly:{target:5,metric:'wins'}, monthly:{target:20,metric:'wins'}, yearly:{target:200,metric:'wins'} }),
       DB.getAllJournal()
     ]);
- 
+
     el.innerHTML = `
       <div class="section-header">
         <div>
@@ -2635,53 +2708,44 @@ const AnalyticsPage = {
           <div class="section-sub">Performance breakdown</div>
         </div>
       </div>
- 
+
       <div class="analytics-period-tabs">
         <button class="analytics-tab ${this._period==='all'?'active':''}"   data-period="all">All Time</button>
         <button class="analytics-tab ${this._period==='week'?'active':''}"  data-period="week">Week</button>
         <button class="analytics-tab ${this._period==='month'?'active':''}" data-period="month">Month</button>
         <button class="analytics-tab ${this._period==='year'?'active':''}"  data-period="year">Year</button>
       </div>
- 
-      <!-- KPI Row -->
-      <div style="padding:0 16px 12px;">
-        <div class="metric-grid">
-          <div class="metric-card">
-            <span class="metric-label">Total Trades</span>
-            <span class="metric-value">${analytics.total}</span>
+
+      <!-- KPI Row — compact single line -->
+      <div style="padding:0 16px 10px;">
+        <div class="kpi-strip">
+          <div class="kpi-item">
+            <span class="kpi-val">${analytics.total}</span>
+            <span class="kpi-lbl">Trades</span>
           </div>
-          <div class="metric-card">
-            <span class="metric-label">Win Rate</span>
-            <span class="metric-value ${analytics.winRate>=50?'green':'red'}">${analytics.winRate}%</span>
+          <div class="kpi-sep"></div>
+          <div class="kpi-item">
+            <span class="kpi-val ${analytics.winRate>=50?'kpi-green':'kpi-red'}">${analytics.winRate}%</span>
+            <span class="kpi-lbl">Win Rate</span>
           </div>
-          <div class="metric-card">
-            <span class="metric-label">Wins</span>
-            <span class="metric-value green">${analytics.wins}</span>
+          <div class="kpi-sep"></div>
+          <div class="kpi-item">
+            <span class="kpi-val kpi-green">${analytics.wins}</span>
+            <span class="kpi-lbl">Wins</span>
           </div>
-          <div class="metric-card">
-            <span class="metric-label">Losses</span>
-            <span class="metric-value red">${analytics.losses}</span>
+          <div class="kpi-sep"></div>
+          <div class="kpi-item">
+            <span class="kpi-val kpi-red">${analytics.losses}</span>
+            <span class="kpi-lbl">Losses</span>
           </div>
         </div>
       </div>
- 
-      <!-- Trading Calendar -->
+
+      <!-- Trading Calendar + inline W/L ratio -->
       <div class="cal-card" id="cal-card">
         ${this._buildCalendar(allEntries)}
       </div>
- 
-      <!-- Win/Loss Pie -->
-      <div class="chart-card">
-        <div class="chart-title">Win / Loss Ratio</div>
-        <div class="chart-wrap" style="height:180px;"><canvas id="pie-chart"></canvas></div>
-      </div>
- 
-      <!-- Monthly Performance Bar -->
-      <div class="chart-card">
-        <div class="chart-title">Monthly Performance</div>
-        <div class="chart-wrap" style="height:200px;"><canvas id="monthly-chart"></canvas></div>
-      </div>
- 
+
       <!-- Entry Model Breakdown -->
       <div class="chart-card">
         <div class="chart-title">Entry Model Performance</div>
@@ -2690,26 +2754,26 @@ const AnalyticsPage = {
           ${this._buildModelRows(analytics.byModel)}
         </div>
       </div>
- 
+
       <!-- Goals -->
       <div class="goal-setting-card">
         <div class="goal-setting-title">Goal Tracker</div>
         ${this._buildGoalEditor(goals)}
       </div>
- 
+
       <div style="height:20px;"></div>
     `;
- 
+
     this._bindEvents(el, allEntries);
     this._renderCharts(analytics);
   },
- 
+
   // ── CALENDAR ─────────────────────────────────────────────────────────────
   _buildCalendar(entries) {
     const year  = this._calYear;
     const month = this._calMonth;
     const monthName = new Date(year, month, 1).toLocaleDateString('en-US', { month:'long', year:'numeric' });
- 
+
     // Aggregate entries by day-key "YYYY-MM-DD"
     const dayMap = {};
     entries.forEach(e => {
@@ -2725,24 +2789,25 @@ const AnalyticsPage = {
       else                       { dayMap[key].loss   += amt; }
       dayMap[key].trades++;
     });
- 
+
     // Monthly stats
-    let monthProfit = 0, monthLoss = 0, tradingDays = 0;
+    let monthProfit = 0, monthLoss = 0, tradingDays = 0, winDays = 0, lossDays = 0;
     Object.values(dayMap).forEach(d => {
       monthProfit += d.profit;
       monthLoss   += d.loss;
       tradingDays++;
+      if ((d.profit - d.loss) >= 0) winDays++; else lossDays++;
     });
     const monthNet = monthProfit - monthLoss;
     const netColor = monthNet >= 0 ? 'var(--accent)' : 'var(--danger)';
     const netSign  = monthNet >= 0 ? '+' : '';
- 
+
     // Calendar grid
     const firstDay  = new Date(year, month, 1).getDay(); // 0=Sun
     const daysInMonth = new Date(year, month + 1, 0).getDate();
- 
+
     const dayHeaders = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
- 
+
     let cells = '';
     // Empty cells before first day
     for (let i = 0; i < firstDay; i++) {
@@ -2754,7 +2819,7 @@ const AnalyticsPage = {
       const data = dayMap[key];
       const today = new Date();
       const isToday = today.getFullYear()===year && today.getMonth()===month && today.getDate()===day;
- 
+
       if (!data) {
         // No trades this day
         cells += `
@@ -2768,7 +2833,7 @@ const AnalyticsPage = {
         const fmtAmt = Math.abs(net) >= 1000
           ? `${net >= 0 ? '+' : '-'}$${(Math.abs(net)/1000).toFixed(1)}K`
           : `${net >= 0 ? '+' : '-'}$${Math.abs(net).toFixed(0)}`;
- 
+
         cells += `
           <div class="cal-cell ${isWin ? 'cal-win' : 'cal-loss'} ${isToday ? 'cal-today' : ''}">
             <span class="cal-day-num">${day}</span>
@@ -2778,7 +2843,7 @@ const AnalyticsPage = {
           </div>`;
       }
     }
- 
+
     return `
       <!-- Monthly stats header -->
       <div class="cal-header">
@@ -2792,17 +2857,35 @@ const AnalyticsPage = {
         </div>
         <button class="cal-nav" id="cal-next">&#8250;</button>
       </div>
- 
+
       <!-- Day headers -->
       <div class="cal-grid-header">
         ${dayHeaders.map(h => `<div class="cal-dow">${h}</div>`).join('')}
       </div>
- 
+
       <!-- Day cells -->
       <div class="cal-grid">
         ${cells}
       </div>
- 
+
+      <!-- Inline Win/Loss ratio -->
+      <div class="cal-ratio-row">
+        <div class="cal-ratio-bar-wrap">
+          <div class="cal-ratio-bar-win"  style="flex:${Math.max(winDays,1)};"></div>
+          <div class="cal-ratio-bar-loss" style="flex:${Math.max(lossDays,1)};"></div>
+        </div>
+        <div class="cal-ratio-labels">
+          <span style="color:var(--accent);">
+            <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="var(--accent)"/></svg>
+            ${winDays} win day${winDays!==1?'s':''}
+          </span>
+          <span style="color:var(--danger);">
+            <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="var(--danger)"/></svg>
+            ${lossDays} loss day${lossDays!==1?'s':''}
+          </span>
+        </div>
+      </div>
+
       <!-- Legend -->
       <div class="cal-legend">
         <span class="cal-legend-dot win"></span><span>Profitable</span>
@@ -2810,7 +2893,7 @@ const AnalyticsPage = {
       </div>
     `;
   },
- 
+
   // ── MODEL ROWS ────────────────────────────────────────────────────────────
   _buildModelRows(byModel) {
     return Object.entries(byModel).map(([name, data]) => {
@@ -2828,7 +2911,7 @@ const AnalyticsPage = {
         </div>`;
     }).join('');
   },
- 
+
   // ── GOAL EDITOR ───────────────────────────────────────────────────────────
   _buildGoalEditor(goals) {
     const periods = ['weekly','monthly','yearly'];
@@ -2856,13 +2939,13 @@ const AnalyticsPage = {
       </div>
     `;
   },
- 
+
   // ── EVENTS ────────────────────────────────────────────────────────────────
   _bindEvents(el, allEntries) {
     el.querySelectorAll('.analytics-tab').forEach(tab => {
       tab.addEventListener('click', () => { this._period = tab.dataset.period; this.render(); });
     });
- 
+
     el.querySelector('#save-goals-btn')?.addEventListener('click', async () => {
       const goals = { weekly:{}, monthly:{}, yearly:{} };
       el.querySelectorAll('.goal-target').forEach(inp => {
@@ -2874,7 +2957,7 @@ const AnalyticsPage = {
       await DB.setSetting('goals', goals);
       App.toast('Goals saved!', 'success');
     });
- 
+
     // Calendar navigation
     el.querySelector('#cal-prev')?.addEventListener('click', () => {
       this._calMonth--;
@@ -2889,7 +2972,7 @@ const AnalyticsPage = {
       if (calCard) { calCard.innerHTML = this._buildCalendar(allEntries); this._rebindCal(el, allEntries); }
     });
   },
- 
+
   _rebindCal(el, allEntries) {
     el.querySelector('#cal-prev')?.addEventListener('click', () => {
       this._calMonth--;
@@ -2904,7 +2987,7 @@ const AnalyticsPage = {
       if (calCard) { calCard.innerHTML = this._buildCalendar(allEntries); this._rebindCal(el, allEntries); }
     });
   },
- 
+
   // ── CHARTS ────────────────────────────────────────────────────────────────
   _renderCharts(analytics) {
     const isDark    = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -2912,63 +2995,13 @@ const AnalyticsPage = {
     const textColor = isDark ? '#8888aa' : '#555570';
     const accent    = '#00e676';
     const danger    = '#ff4757';
- 
+
     Chart.defaults.color       = textColor;
     Chart.defaults.font.family = "'DM Sans', sans-serif";
- 
+
     Object.values(this._charts).forEach(c => { try { c.destroy(); } catch{} });
     this._charts = {};
- 
-    // PIE
-    const pieCtx = document.getElementById('pie-chart');
-    if (pieCtx && (analytics.wins + analytics.losses) > 0) {
-      this._charts.pie = new Chart(pieCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['Wins','Losses','Pending'],
-          datasets: [{
-            data: [analytics.wins, analytics.losses, analytics.pending],
-            backgroundColor: [accent, danger, '#2979ff'],
-            borderColor: isDark ? '#14141e' : '#ffffff',
-            borderWidth: 3,
-          }]
-        },
-        options: {
-          responsive:true, maintainAspectRatio:false, cutout:'68%',
-          plugins:{ legend:{ position:'right', labels:{ padding:16, font:{ size:12 } } } }
-        }
-      });
-    }
- 
-    // MONTHLY BAR
-    const monthCtx = document.getElementById('monthly-chart');
-    if (monthCtx) {
-      const monthly = analytics.monthly;
-      const keys    = Object.keys(monthly).sort().slice(-12);
-      const labels  = keys.map(k => {
-        const [y,m] = k.split('-');
-        return new Date(y,m-1).toLocaleDateString('en-US',{month:'short',year:'2-digit'});
-      });
-      this._charts.monthly = new Chart(monthCtx, {
-        type: 'bar',
-        data: {
-          labels: labels.length ? labels : ['No data'],
-          datasets: [
-            { label:'Wins',   data:keys.map(k=>monthly[k].w), backgroundColor:accent+'99', borderColor:accent, borderWidth:1.5, borderRadius:4 },
-            { label:'Losses', data:keys.map(k=>monthly[k].l), backgroundColor:danger+'99', borderColor:danger, borderWidth:1.5, borderRadius:4 }
-          ]
-        },
-        options: {
-          responsive:true, maintainAspectRatio:false,
-          scales:{
-            x:{ grid:{color:gridColor}, ticks:{font:{size:10}} },
-            y:{ grid:{color:gridColor}, ticks:{font:{size:10},stepSize:1}, beginAtZero:true }
-          },
-          plugins:{ legend:{ labels:{font:{size:11},padding:12} } }
-        }
-      });
-    }
- 
+
     // MODEL BAR
     const modelCtx = document.getElementById('model-chart');
     if (modelCtx) {
@@ -2994,9 +3027,9 @@ const AnalyticsPage = {
     }
   }
 };
- 
+
 window.AnalyticsPage = AnalyticsPage;
- 
+
 /* ============================================
    STRATEGY PAGE — Updated strategy reference
 ============================================ */
@@ -3008,7 +3041,7 @@ const StrategyPage = {
         <div class="strategy-hero-title">Trading Strategy</div>
         <div class="strategy-hero-sub">Session · Bias · 15M Confirmation · Value Areas · 4 Entry Models</div>
       </div>
- 
+
       <!-- STEP 1: SESSION -->
       <div class="strategy-section">
         <div class="strategy-section-title">Step 1 — Determine the Session</div>
@@ -3029,7 +3062,7 @@ const StrategyPage = {
           <p>Only trade within the active session window. Setups forming outside these hours carry significantly lower probability and institutional backing. <strong>Patience is the edge.</strong></p>
         </div>
       </div>
- 
+
       <!-- STEP 2: MARKET BIAS -->
       <div class="strategy-section">
         <div class="strategy-section-title">Step 2 — Market Bias</div>
@@ -3046,7 +3079,7 @@ const StrategyPage = {
           <p>No clear structure. Price is ranging around the 200 EMA. <strong>Do not force a bias.</strong> Wait for directional confirmation before executing.</p>
         </div>
       </div>
- 
+
       <!-- STEP 3: 15M CONFIRMATION -->
       <div class="strategy-section">
         <div class="strategy-section-title">Step 3 — 15M Confirmation</div>
@@ -3076,7 +3109,7 @@ const StrategyPage = {
           </div>
         </div>
       </div>
- 
+
       <!-- STEP 4: VALUE AREAS -->
       <div class="strategy-section">
         <div class="strategy-section-title">Step 4 — Value Area Levels</div>
@@ -3107,11 +3140,11 @@ const StrategyPage = {
           </div>
         </div>
       </div>
- 
+
       <!-- ENTRY MODELS -->
       <div class="strategy-section">
         <div class="strategy-section-title">Entry Models</div>
- 
+
         <div class="entry-model-card">
           <div class="entry-model-num">Model 01</div>
           <div class="entry-model-name">V-Shape Recovery</div>
@@ -3125,7 +3158,7 @@ const StrategyPage = {
             <div class="entry-model-step">SL beyond the wick low/high of the V. TP minimum 1:2 RR</div>
           </div>
         </div>
- 
+
         <div class="entry-model-card">
           <div class="entry-model-num">Model 02</div>
           <div class="entry-model-name">Order Block Mitigation + Strong Rejection</div>
@@ -3138,7 +3171,7 @@ const StrategyPage = {
             <div class="entry-model-step">SL beyond the OB. TP minimum 1:2 RR — target the next liquidity pool</div>
           </div>
         </div>
- 
+
         <div class="entry-model-card">
           <div class="entry-model-num">Model 03</div>
           <div class="entry-model-name">iFVG Entry</div>
@@ -3149,7 +3182,7 @@ const StrategyPage = {
             <div class="entry-model-step">SL above/below the iFVG zone. TP at the next key level minimum 1:2 RR</div>
           </div>
         </div>
- 
+
         <div class="entry-model-card">
           <div class="entry-model-num">Model 04</div>
           <div class="entry-model-name">iFVG Mitigation + Strong Rejection</div>
@@ -3162,7 +3195,7 @@ const StrategyPage = {
           </div>
         </div>
       </div>
- 
+
       <!-- RISK MANAGEMENT -->
       <div class="strategy-section">
         <div class="strategy-section-title">Risk Management Rules</div>
@@ -3193,7 +3226,7 @@ const StrategyPage = {
           </div>
         </div>
       </div>
- 
+
       <!-- MINDSET -->
       <div class="strategy-section" style="padding-bottom:24px;">
         <div class="strategy-section-title">Professional Mindset</div>
@@ -3207,9 +3240,9 @@ const StrategyPage = {
     `;
   }
 };
- 
+
 window.StrategyPage = StrategyPage;
- 
+
 /* ============================================
    SETTINGS PAGE
 ============================================ */
@@ -3220,7 +3253,7 @@ const SettingsPage = {
       DB.getSetting('theme', 'dark'),
       DB.getSetting('showStartup', true)
     ]);
- 
+
     el.innerHTML = `
       <div class="section-header">
         <div>
@@ -3228,7 +3261,7 @@ const SettingsPage = {
           <div class="section-sub">Customize your experience</div>
         </div>
       </div>
- 
+
       <!-- Appearance -->
       <div class="settings-section">
         <div class="settings-section-title">Appearance</div>
@@ -3245,7 +3278,7 @@ const SettingsPage = {
           </div>
         </div>
       </div>
- 
+
       <!-- Preferences -->
       <div class="settings-section">
         <div class="settings-section-title">Preferences</div>
@@ -3262,7 +3295,7 @@ const SettingsPage = {
           </div>
         </div>
       </div>
- 
+
       <!-- Data Management -->
       <div class="settings-section">
         <div class="settings-section-title">Data Management</div>
@@ -3290,7 +3323,7 @@ const SettingsPage = {
           </div>
         </div>
       </div>
- 
+
       <!-- Danger Zone -->
       <div class="settings-section">
         <div class="settings-section-title">Danger Zone</div>
@@ -3315,7 +3348,7 @@ const SettingsPage = {
           </div>
         </div>
       </div>
- 
+
       <!-- About -->
       <div class="settings-section" style="padding-bottom:24px;">
         <div class="settings-section-title">About</div>
@@ -3338,11 +3371,11 @@ const SettingsPage = {
         </div>
       </div>
     `;
- 
+
     this._bindEvents(el);
     this._loadStorageSize(el);
   },
- 
+
   _bindEvents(el) {
     el.querySelector('#theme-toggle')?.addEventListener('change', async (e) => {
       const theme = e.target.checked ? 'dark' : 'light';
@@ -3352,11 +3385,11 @@ const SettingsPage = {
       await DB.setSetting('theme', theme);
       App.toast('Theme updated', 'success');
     });
- 
+
     el.querySelector('#startup-toggle')?.addEventListener('change', async (e) => {
       await DB.setSetting('showStartup', e.target.checked);
     });
- 
+
     el.querySelector('#export-btn')?.addEventListener('click', async () => {
       try {
         const data = await DB.exportAll();
@@ -3373,7 +3406,7 @@ const SettingsPage = {
         App.toast('Export failed: ' + e.message, 'error');
       }
     });
- 
+
     el.querySelector('#import-file-input')?.addEventListener('change', async (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -3390,7 +3423,7 @@ const SettingsPage = {
       });
       e.target.value = '';
     });
- 
+
     el.querySelector('#clear-journal-btn')?.addEventListener('click', () => {
       App.confirm('Clear All Journal Entries?', 'All trade journal records will be permanently deleted.', async () => {
         const entries = await DB.getAllJournal();
@@ -3398,7 +3431,7 @@ const SettingsPage = {
         App.toast('Journal cleared', 'info');
       });
     });
- 
+
     el.querySelector('#clear-all-btn')?.addEventListener('click', () => {
       App.confirm('Reset Everything?', 'ALL data will be permanently deleted — setups, journal entries, and settings.', async () => {
         try {
@@ -3415,7 +3448,7 @@ const SettingsPage = {
       });
     });
   },
- 
+
   async _loadStorageSize(el) {
     try {
       if (navigator.storage && navigator.storage.estimate) {
@@ -3427,9 +3460,9 @@ const SettingsPage = {
     } catch {}
   }
 };
- 
+
 window.SettingsPage = SettingsPage;
- 
+
 /* ============================================
    APP CONTROLLER — Trade Execution Journal
 ============================================ */
@@ -3444,50 +3477,50 @@ const App = {
     strategy:  { module: () => StrategyPage.render()  },
     settings:  { module: () => SettingsPage.render()  },
   },
- 
+
   async init() {
     const theme = await DB.getSetting('theme', 'dark');
     document.documentElement.setAttribute('data-theme', theme);
     const meta = document.getElementById('theme-color-meta');
     if (meta) meta.content = theme === 'dark' ? '#0a0a0f' : '#f4f4f8';
- 
+
     const showStartup = await DB.getSetting('showStartup', true);
     if (showStartup) document.getElementById('startup-modal')?.classList.remove('hidden');
     else             document.getElementById('startup-modal')?.classList.add('hidden');
- 
+
     document.getElementById('startup-dismiss')?.addEventListener('click', () => {
       document.getElementById('startup-modal')?.classList.add('hidden');
     });
- 
+
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', () => { if (btn.dataset.page) this.navigate(btn.dataset.page); });
     });
- 
+
     document.getElementById('settings-btn')?.addEventListener('click', () => this.navigate('settings'));
- 
+
     document.getElementById('search-btn')?.addEventListener('click', () => this._toggleSearch(true));
     document.getElementById('search-close')?.addEventListener('click', () => this._toggleSearch(false));
     document.getElementById('global-search-input')?.addEventListener('input', e => this._doSearch(e.target.value));
- 
+
     document.getElementById('confirm-cancel')?.addEventListener('click', () => this._closeConfirm());
     document.getElementById('img-viewer-close')?.addEventListener('click', () =>
       document.getElementById('img-viewer-modal')?.classList.add('hidden'));
     document.getElementById('img-viewer-modal')?.addEventListener('click', e => {
       if (e.target === e.currentTarget) e.currentTarget.classList.add('hidden');
     });
- 
+
     // Input modal ESC close
     document.getElementById('input-modal')?.addEventListener('click', e => {
       if (e.target === e.currentTarget) this._closeInputModal();
     });
- 
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
- 
+
     await this.navigate('home');
   },
- 
+
   async navigate(page) {
     if (!this._pages[page]) return;
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -3510,10 +3543,10 @@ const App = {
         </div>`;
     }
   },
- 
+
   // ── CONFIRM MODAL ──────────────────────────
   _confirmCallback: null,
- 
+
   confirm(title, message, onConfirm) {
     document.getElementById('confirm-title').textContent = title || 'Confirm';
     document.getElementById('confirm-message').textContent = message || 'Are you sure?';
@@ -3528,12 +3561,12 @@ const App = {
       if (cb) cb();
     });
   },
- 
+
   _closeConfirm() {
     document.getElementById('confirm-modal')?.classList.add('hidden');
     this._confirmCallback = null;
   },
- 
+
   // ── INPUT MODAL (form fields) ───────────────
   // fields: [{id, label, type, placeholder, options:[{value,label}], required}]
   showInputModal(title, fields, onSubmit) {
@@ -3543,7 +3576,7 @@ const App = {
     const okBtn   = document.getElementById('input-modal-ok');
     const cancelBtn = document.getElementById('input-modal-cancel');
     if (!modal) return;
- 
+
     titleEl.textContent = title;
     bodyEl.innerHTML = fields.map(f => `
       <div class="form-group">
@@ -3559,15 +3592,15 @@ const App = {
         `}
       </div>
     `).join('');
- 
+
     modal.classList.remove('hidden');
     bodyEl.querySelector('input,select')?.focus();
- 
+
     const newOk = okBtn.cloneNode(true);
     okBtn.parentNode.replaceChild(newOk, okBtn);
     const newCancel = cancelBtn.cloneNode(true);
     cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
- 
+
     newCancel.addEventListener('click', () => this._closeInputModal());
     newOk.addEventListener('click', () => {
       const values = {};
@@ -3585,11 +3618,11 @@ const App = {
       onSubmit(values);
     });
   },
- 
+
   _closeInputModal() {
     document.getElementById('input-modal')?.classList.add('hidden');
   },
- 
+
   // ── TOAST ──────────────────────────────────
   toast(message, type = 'info') {
     const container = document.getElementById('toast-container');
@@ -3600,7 +3633,7 @@ const App = {
     container.appendChild(toast);
     setTimeout(() => { toast.classList.add('toast-out'); setTimeout(() => toast.remove(), 260); }, 3000);
   },
- 
+
   // ── IMAGE VIEWER ───────────────────────────
   showImage(src) {
     const modal = document.getElementById('img-viewer-modal');
@@ -3609,7 +3642,7 @@ const App = {
     img.src = src;
     modal.classList.remove('hidden');
   },
- 
+
   // ── SEARCH ─────────────────────────────────
   _toggleSearch(open) {
     const panel = document.getElementById('search-panel');
@@ -3625,7 +3658,7 @@ const App = {
       if (res) res.innerHTML = '';
     }
   },
- 
+
   async _doSearch(query) {
     const resultsEl = document.getElementById('search-results');
     if (!resultsEl) return;
@@ -3658,12 +3691,10 @@ const App = {
     });
   }
 };
- 
+
 document.addEventListener('DOMContentLoaded', () => App.init());
 window.App = App;
- 
+
 </script>
 </body>
 </html>
-
-
