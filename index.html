@@ -6571,17 +6571,16 @@
         <span class="eco-cal-title">📅 Economic Calendar</span>
       </div>
       <div class="eco-cal-body">
-        <iframe src="https://sslecal2.investing.com?ecoDayBackground=%23000000&columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25,32,6,37,72,22,17,39,14,10,35,43,56,36,110,11,26,12,4,5&calType=day&timeZone=20&lang=1" width="650" height="467" frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0"></iframe><div class="poweredBy" style="font-family: Arial, Helvetica, sans-serif;"><span style="font-size: 11px;color: #333333;text-decoration: none;">Real Time Economic Calendar provided by <a href="https://www.investing.com/" rel="nofollow" target="_blank" style="font-size: 11px;color: #06529D; font-weight: bold;" class="underline_link">Investing.com</a>.</span></div>
-
-        <div style="padding:8px 14px 10px;flex-shrink:0;border-top:1px solid var(--border);">
-          <span style="font-size:10px;color:var(--text-muted);">
-            Real Time Economic Calendar by
-            <a href="https://www.investing.com/" rel="nofollow" target="_blank"
-              style="color:var(--accent);font-weight:600;">Investing.com</a>
-          </span>
-        </div>
-      </div>
-    `;
+        <div style="position:relative; width:100%; padding-bottom:180%; height:0; overflow:hidden;">
+      <iframe 
+        src="https://sslecal2.investing.com?columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25,32,6,37,72,22,17,39,14,10,35,43,56,36,110,11,26,12,4,5&calType=day&timeZone=20&lang=1" 
+        style="position:absolute; top:0; left:0; width:100%; height:100%;" 
+        frameborder="0" 
+        allowtransparency="true" 
+        marginwidth="0" 
+        marginheight="0">
+      </iframe>
+</div>`;
 
           document.getElementById("app").appendChild(page);
 
