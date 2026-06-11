@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover"/>
 <meta name="theme-color" content="#0a0a0f" id="theme-color-meta"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
@@ -1054,6 +1055,162 @@ a { color: inherit; text-decoration: none; }
   gap: 5px;
 }
 
+/* =============================================
+   HOME — Floating action button + tray
+============================================= */
+.home-fab-btn {
+  position: absolute;
+  bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 14px);
+  right: 14px;
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 18px rgba(0,230,118,0.4);
+  cursor: pointer;
+  z-index: 45;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+.home-fab-btn:active { transform: scale(0.92); }
+
+.home-tray {
+  position: absolute;
+  bottom: calc(var(--bottom-nav-h) + var(--safe-bottom) + 72px);
+  right: 14px;
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 46;
+  min-width: 160px;
+  overflow: hidden;
+  animation: trayIn 200ms cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes trayIn {
+  from { opacity:0; transform: scale(0.88) translateY(12px); }
+  to   { opacity:1; transform: none; }
+}
+.home-tray.hidden { display: none; }
+
+.home-tray-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; cursor: pointer;
+  transition: background var(--t-fast);
+  border-bottom: 1px solid var(--border);
+}
+.home-tray-item:last-child { border-bottom: none; }
+.home-tray-item:hover { background: var(--bg-3); }
+.home-tray-icon { font-size: 20px; }
+.home-tray-label { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+/* =============================================
+   LOT TABLE MODAL
+============================================= */
+.lot-tabs {
+  display: flex; gap: 4px;
+  background: var(--bg-3); border-radius: 10px;
+  padding: 4px; margin-bottom: 14px;
+}
+.lot-tab {
+  flex: 1; padding: 7px 4px;
+  border-radius: 8px; font-size: 11px; font-weight: 700;
+  color: var(--text-muted); text-align: center; cursor: pointer;
+  transition: all var(--t-fast); border: none; background: none;
+  font-family: var(--font-body);
+}
+.lot-tab.active {
+  background: var(--card-bg); color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.lot-table-wrap { animation: pageFade 200ms ease; }
+
+.lot-tbl {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--font-mono); font-size: 12px;
+}
+.lot-tbl th {
+  padding: 7px 8px; text-align: center;
+  font-size: 10px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.4px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.lot-tbl td {
+  padding: 9px 8px; text-align: center;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.lot-tbl tr:last-child td { border-bottom: none; }
+.lot-tbl tr:hover td { background: var(--bg-3); }
+.lot-tbl th:first-child, .lot-tbl td:first-child {
+  text-align: left; padding-left: 2px;
+}
+
+/* =============================================
+   TOOLS PAGE
+============================================= */
+.tools-card {
+  background: var(--card-bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 16px;
+}
+.tools-card-title {
+  font-size: 13px; font-weight: 700; color: var(--text-primary);
+  margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+}
+
+/* Session Clock */
+.session-clock-grid {
+  display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px;
+}
+.session-tile {
+  background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  transition: border-color var(--t-base), background var(--t-base);
+}
+.session-tile.session-active {
+  background: rgba(0,230,118,0.08); border-color: rgba(0,230,118,0.35);
+}
+.session-tile-city {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-muted);
+}
+.session-tile-time {
+  font-family: var(--font-mono); font-size: 17px; font-weight: 700;
+  color: var(--text-primary); line-height: 1;
+}
+.session-tile.session-active .session-tile-time { color: var(--accent); }
+.session-tile-badge {
+  font-size: 9px; color: var(--text-muted); font-family: var(--font-mono);
+}
+.session-status-bar { display: flex; justify-content: center; padding: 4px 0 2px; }
+.session-badge { font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 20px; }
+.session-badge.on  { background: rgba(0,230,118,0.12); color: var(--accent); border: 1px solid rgba(0,230,118,0.3); }
+.session-badge.off { background: var(--bg-3); color: var(--text-muted); border: 1px solid var(--border); }
+
+/* Calc result cards */
+.tool-result-card {
+  background: var(--bg-3); border-radius: var(--radius-sm);
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 8px;
+  border: 1px solid var(--border);
+}
+.tool-result-row {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.tool-result-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+.tool-result-val {
+  font-family: var(--font-mono); font-size: 14px; font-weight: 700;
+  color: var(--text-primary);
+}
+.tool-result-val.accent { color: var(--accent); }
+
+/* Nav badge — make 7-item nav slightly smaller text */
+.bottom-nav .nav-btn span { font-size: 9px; }
+
 </style>
 </head>
 <body>
@@ -1213,7 +1370,6 @@ a { color: inherit; text-decoration: none; }
   </nav>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
 /* ============================================
@@ -1522,18 +1678,33 @@ const HomePage = {
           </div>
         </div>
 
+      <!-- Economic Calendar -->
+      <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-muted);padding:10px 14px 8px;">📅 Economic Calendar</div>
+        <div style="overflow:hidden;border-top:1px solid var(--border);">
+          <iframe src="https://sslecal2.investing.com?ecoDayBackground=%23ff0000&columns=exc_flags,exc_currency,exc_importance,exc_actual,exc_forecast,exc_previous&features=datepicker,timezone&countries=25,32,6,37,72,22,17,39,14,10,35,43,56,36,110,11,26,12,4,5&calType=day&timeZone=20&lang=1"
+            width="100%" height="360" frameborder="0" allowtransparency="true" marginwidth="0" marginheight="0"
+            style="display:block;border:none;"></iframe>
+        </div>
+        <div style="padding:6px 14px 10px;">
+          <span style="font-size:10px;color:var(--text-muted);">Real Time Economic Calendar by <a href="https://www.investing.com/" rel="nofollow" target="_blank" style="color:var(--accent);font-weight:600;">Investing.com</a></span>
+        </div>
       </div>
+
+      <div style="height:80px;"></div>
     `;
 
-    // Animate bars after paint
+    // Animate progress bars
     requestAnimationFrame(() => {
       el.querySelectorAll('.hpb-fill[data-w]').forEach(b => {
         b.style.width = b.dataset.w + '%';
       });
     });
 
-    // Remove FAB if it exists from a previous version
     document.getElementById('home-fab')?.remove();
+    document.getElementById('home-tray-overlay')?.remove();
+    document.getElementById('home-tray')?.remove();
+    HomeFab.init();
   },
 
   _greeting() {
@@ -2200,18 +2371,17 @@ const WatchlistPage = {
     titleEl.textContent = '✕ Close Setup';
     bodyEl.innerHTML = `
       <p style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin-bottom:4px;">
-        Was this setup traded, or simply not taken?
+        Select the outcome for this setup:
       </p>
       <div class="form-group">
         <label class="form-label">Outcome</label>
         <select class="form-select" id="inv-outcome">
-          <option value="not_taken">Not Taken — invalidated before entry</option>
-          <option value="profit">Trade Taken — Result: Win</option>
-          <option value="loss">Trade Taken — Result: Loss</option>
+          <option value="nt_win">Not Taken — Result: Win</option>
+          <option value="nt_loss">Not Taken — Result: Loss</option>
         </select>
       </div>
-      <div id="inv-amount-wrap" style="display:none;" class="form-group">
-        <label class="form-label" id="inv-amount-label">Amount ($ / pips / R)</label>
+      <div class="form-group">
+        <label class="form-label" id="inv-amount-label">Win Amount ($ / pips / R)</label>
         <input type="number" class="form-input" id="inv-amount" placeholder="e.g. 2.5"
           step="0.01" min="0"
           style="appearance:textfield;-moz-appearance:textfield;-webkit-appearance:none;" />
@@ -2220,14 +2390,11 @@ const WatchlistPage = {
 
     modal.classList.remove('hidden');
 
-    const outcomeEl  = bodyEl.querySelector('#inv-outcome');
-    const amtWrap    = bodyEl.querySelector('#inv-amount-wrap');
-    const amtLabel   = bodyEl.querySelector('#inv-amount-label');
-
+    const outcomeEl = bodyEl.querySelector('#inv-outcome');
+    const amtLabel  = bodyEl.querySelector('#inv-amount-label');
     outcomeEl.addEventListener('change', () => {
-      const v = outcomeEl.value;
-      amtWrap.style.display = (v === 'profit' || v === 'loss') ? 'block' : 'none';
-      amtLabel.textContent  = v === 'profit' ? 'Profit Amount ($ / pips / R)' : 'Loss Amount ($ / pips / R)';
+      amtLabel.textContent = outcomeEl.value === 'nt_win'
+        ? 'Win Amount ($ / pips / R)' : 'Loss Amount ($ / pips / R)';
     });
 
     const newOk     = okBtn.cloneNode(true);
@@ -2248,13 +2415,8 @@ const WatchlistPage = {
     // Remove from watchlist entirely
     await DB.deleteSetup(setup.id);
 
-    const journalStatus =
-      outcome === 'profit' ? 'profit' :
-      outcome === 'loss'   ? 'loss'   : 'pending';
-
-    const closedLabel =
-      outcome === 'not_taken' ? 'Not Taken' :
-      outcome === 'profit'    ? 'Win'        : 'Loss';
+    const journalStatus = 'invalidated';
+    const closedLabel = outcome === 'nt_win' ? 'Not Taken — Win' : 'Not Taken — Loss';
 
     await DB.saveJournalEntry({
       id:           crypto.randomUUID(),
@@ -2267,16 +2429,14 @@ const WatchlistPage = {
       checks:       { ...(setup.checks || {}) },
       status:       journalStatus,
       closedReason: closedLabel,
-      profitAmount: outcome === 'profit' ? amount : null,
-      lossAmount:   outcome === 'loss'   ? amount : null,
+      profitAmount: outcome === 'nt_win'  ? amount : null,
+      lossAmount:   outcome === 'nt_loss' ? amount : null,
       createdAt:    Date.now(),
       updatedAt:    Date.now()
     });
 
-    const msg  = outcome === 'not_taken' ? 'Setup closed — Not Taken'
-               : outcome === 'profit'    ? 'Win recorded 🎉'
-               :                          'Loss recorded';
-    const type = outcome === 'profit' ? 'success' : 'info';
+    const msg  = outcome === 'nt_win' ? 'Not Taken — Win 🎉' : 'Not Taken — Loss';
+    const type = outcome === 'nt_win' ? 'success' : 'info';
     App.toast(msg, type);
     this.render();
   },
@@ -2300,10 +2460,10 @@ const JournalPage = {
           <div class="section-title">Trade Journal</div>
           <div class="section-sub">${entries.length} entr${entries.length !== 1 ? 'ies' : 'y'}</div>
         </div>
-        <button class="btn btn-ghost btn-sm" id="jnl-csv-btn" title="Export CSV">
+        <button class="btn btn-ghost btn-sm" id="jnl-csv-btn" title="Export JSON">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg> CSV
+          </svg> JSON
         </button>
       </div>
 
@@ -2395,7 +2555,7 @@ const JournalPage = {
     const dateStr   = new Date(e.createdAt).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
     const dirClass  = e.direction === 'buy' ? 'buy' : 'sell';
     const dirSym    = e.direction === 'sell' ? '▼' : '▲';
-    const isClosed  = e.status === 'profit' || e.status === 'loss';
+    const isClosed  = e.status === 'profit' || e.status === 'loss' || e.status === 'invalidated';
 
     // Setup screenshots (from when trade was taken)
     const setupThumbs = (e.screenshots || []).slice(0,3)
@@ -2449,6 +2609,7 @@ const JournalPage = {
         ` : ''}
 
         <div class="journal-card-actions">
+          ${e.status !== 'invalidated' ? `
           <button class="btn btn-sm jnl-profit" data-id="${e.id}"
             ${isClosed ? 'disabled' : ''}
             style="flex:1;background:${e.status==='profit'?'var(--accent)':'var(--bg-3)'};color:${e.status==='profit'?'#000':'var(--accent)'};border:1.5px solid var(--accent);${isClosed && e.status!=='profit' ? 'opacity:0.35;' : ''}">
@@ -2459,6 +2620,7 @@ const JournalPage = {
             style="flex:1;background:${e.status==='loss'?'var(--danger)':'var(--bg-3)'};color:${e.status==='loss'?'#fff':'var(--danger)'};border:1.5px solid var(--danger);${isClosed && e.status!=='loss' ? 'opacity:0.35;' : ''}">
             ✗ Loss
           </button>
+          ` : ''}
           <button class="btn btn-ghost btn-sm jnl-delete" data-id="${e.id}" style="color:var(--danger);padding:0 12px;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
               <polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -2666,19 +2828,13 @@ const JournalPage = {
 
   _exportCSV(entries) {
     if (!entries.length) { App.toast('No entries to export', 'error'); return; }
-    const hdrs = ['ID','Pair','Direction','Entry Model','Status','Lot Size','Profit','Loss','Created At'];
-    const rows = entries.map(e => [
-      e.id, e.pair, e.direction, e.setupType||'', e.status,
-      e.lotSize||'', e.profitAmount||'', e.lossAmount||'',
-      new Date(e.createdAt).toISOString()
-    ]);
-    const csv  = [hdrs,...rows].map(r => r.join(',')).join('\n');
-    const blob = new Blob([csv], { type:'text/csv' });
+    const json = JSON.stringify({ exportedAt: Date.now(), entries }, null, 2);
+    const blob = new Blob([json], { type:'application/json' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
-    a.href = url; a.download = `trade-journal-${Date.now()}.csv`;
+    a.href = url; a.download = `trade-journal-entries-${new Date().toISOString().slice(0,10)}.json`;
     a.click(); URL.revokeObjectURL(url);
-    App.toast('CSV exported', 'success');
+    App.toast('Journal exported as JSON', 'success');
   },
 };
 
@@ -3532,6 +3688,11 @@ const App = {
     document.getElementById('main-content')?.scrollTo({ top: 0, behavior: 'instant' });
     this._currentPage = page;
     if (page !== "journal") document.getElementById("jnl-summary-bar")?.remove();
+    if (page !== "home") {
+      document.getElementById("home-fab")?.remove();
+      document.getElementById("home-tray")?.remove();
+      document.getElementById("home-tray-overlay")?.remove();
+    }
     try {
       await this._pages[page].module();
     } catch(err) {
@@ -3692,8 +3853,188 @@ const App = {
   }
 };
 
+/* ============================================================
+   TOOLS PAGE
+============================================================ */
+
 document.addEventListener('DOMContentLoaded', () => App.init());
 window.App = App;
+
+/* ============================================================
+   TOOLS PAGE
+============================================================ */
+/* ============================================================
+   HOME FAB — floating tray + Lot Table modal
+============================================================ */
+const HomeFab = {
+  _open: false,
+
+  init() {
+    const appEl = document.getElementById('app');
+    if (!appEl) return;
+
+    // Overlay (closes tray on outside tap)
+    const overlay = document.createElement('div');
+    overlay.id = 'home-tray-overlay';
+    overlay.style.cssText = 'position:absolute;inset:0;z-index:44;display:none;';
+    overlay.addEventListener('click', () => this.close());
+    appEl.appendChild(overlay);
+
+    // FAB button
+    const fab = document.createElement('button');
+    fab.id = 'home-fab';
+    fab.className = 'home-fab-btn';
+    fab.setAttribute('aria-label', 'Tools');
+    fab.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+      <circle cx="6"  cy="12" r="1.5" fill="currentColor"/>
+      <circle cx="18" cy="12" r="1.5" fill="currentColor"/>
+    </svg>`;
+    fab.addEventListener('click', () => this.toggle());
+    appEl.appendChild(fab);
+
+    // Tray
+    const tray = document.createElement('div');
+    tray.id = 'home-tray';
+    tray.className = 'home-tray hidden';
+    tray.innerHTML = `
+      <div class="home-tray-item" id="tray-lot-table">
+        <div class="home-tray-icon">📊</div>
+        <div class="home-tray-label">Lot Table</div>
+      </div>
+    `;
+    appEl.appendChild(tray);
+
+    tray.querySelector('#tray-lot-table').addEventListener('click', () => {
+      this.close();
+      this.showLotTable();
+    });
+
+    this._open = false;
+  },
+
+  toggle() {
+    this._open ? this.close() : this.open();
+  },
+  open() {
+    this._open = true;
+    document.getElementById('home-tray')?.classList.remove('hidden');
+    document.getElementById('home-tray-overlay').style.display = 'block';
+  },
+  close() {
+    this._open = false;
+    document.getElementById('home-tray')?.classList.add('hidden');
+    const ov = document.getElementById('home-tray-overlay');
+    if (ov) ov.style.display = 'none';
+  },
+
+  showLotTable() {
+    const modal   = document.getElementById('input-modal');
+    const titleEl = document.getElementById('input-modal-title');
+    const bodyEl  = document.getElementById('input-modal-body');
+    const okBtn   = document.getElementById('input-modal-ok');
+    const cancelBtn = document.getElementById('input-modal-cancel');
+
+    titleEl.textContent = '📊 Lot Size Reference Table';
+
+    // Instrument data: { name, tickValue ($ per point per lot), targets: [{ticks, label}] }
+    const instruments = [
+      {
+        name: 'NAS100',
+        flag: '🇺🇸',
+        desc: '$1 per point / lot',
+        tickVal: 1,
+        targets: [500, 800, 1000, 1200],
+        color: '#2979ff',
+      },
+      {
+        name: 'S&P500',
+        flag: '🇺🇸',
+        desc: '$1 per point / lot',
+        tickVal: 1,
+        targets: [85, 135, 170, 200],
+        color: '#00e676',
+      },
+      {
+        name: 'DAX40',
+        flag: '🇩🇪',
+        desc: '€1 per point / lot',
+        tickVal: 1,
+        targets: [200, 320, 400, 480],
+        color: '#ffd600',
+      },
+      {
+        name: 'FTSE100',
+        flag: '🇬🇧',
+        desc: '£1 per point / lot',
+        tickVal: 1,
+        targets: [150, 240, 300, 360],
+        color: '#ff4757',
+      },
+    ];
+
+    const lots = [0.1, 0.5, 1.0, 2.0, 3.0];
+
+    let tabs = instruments.map((ins, i) =>
+      `<button class="lot-tab ${i===0?'active':''}" data-ins="${i}">${ins.flag} ${ins.name}</button>`
+    ).join('');
+
+    let tables = instruments.map((ins, i) => `
+      <div class="lot-table-wrap ${i===0?'':'hidden'}" data-ins-panel="${i}">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;text-align:center;">${ins.desc}</div>
+        <div style="overflow-x:auto;">
+          <table class="lot-tbl">
+            <thead>
+              <tr>
+                <th>Ticks</th>
+                ${lots.map(l => `<th>${l} lot</th>`).join('')}
+              </tr>
+            </thead>
+            <tbody>
+              ${ins.targets.map(t => `
+                <tr>
+                  <td style="font-weight:700;color:${ins.color};">${t}</td>
+                  ${lots.map(l => {
+                    const pnl = (t * ins.tickVal * l).toFixed(2);
+                    return `<td>$${pnl}</td>`;
+                  }).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `).join('');
+
+    bodyEl.innerHTML = `
+      <div class="lot-tabs">${tabs}</div>
+      ${tables}
+    `;
+
+    // Tab switching
+    bodyEl.querySelectorAll('.lot-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        bodyEl.querySelectorAll('.lot-tab').forEach(b => b.classList.remove('active'));
+        bodyEl.querySelectorAll('[data-ins-panel]').forEach(p => p.classList.add('hidden'));
+        btn.classList.add('active');
+        bodyEl.querySelector('[data-ins-panel="' + btn.dataset.ins + '"]')?.classList.remove('hidden');
+      });
+    });
+
+    modal.classList.remove('hidden');
+
+    const newOk = okBtn.cloneNode(true);
+    okBtn.parentNode.replaceChild(newOk, okBtn);
+    const newCancel = cancelBtn.cloneNode(true);
+    cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+
+    newOk.textContent = 'Close';
+    newCancel.style.display = 'none';
+    newOk.addEventListener('click', () => App._closeInputModal());
+  },
+};
+
+window.HomeFab = HomeFab;
 
 </script>
 </body>
