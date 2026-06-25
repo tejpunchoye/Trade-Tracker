@@ -765,13 +765,15 @@
     ]);
 
     const CHECKLIST_ITEMS=[
-      {group:"Session",icon:"🕐",items:[
+      // ── SESSION — radio style: only one can be active ────────────
+      {group:"Session",icon:"🕐",radio:true,items:[
         {id:"sess1",title:"London Session",desc:"Trading during the London session (12:00–17:00 MUT / 08:00–13:00 BST)."},
         {id:"sess2",title:"New York Session",desc:"Trading during the New York session (16:30–20:00 MUT / 12:30–16:00 BST)."},
       ]},
+      // ── 15M CONFIRMATION — Asian IB first ────────────────────────
       {group:"15M Confirmation",icon:"📉",items:[
-        {id:"htf1",title:"Is the 15-Minute Played Out?",desc:"The 15M has shown its displacement. Looking for the reaction entry now."},
-        {id:"htf4",title:"Asian Session Initial Balance Marked",desc:"The high and low of the Asian session (00:00–08:00 MUT) are clearly marked on the chart as the initial balance range."},
+        {id:"htf4",title:"Asian Session Initial Balance Marked",desc:"The high and low of the first hour of the Asian session (00:00–01:00 MUT) are clearly marked as the initial balance range."},
+        {id:"htf1",title:"Is the 15-Minute Played Out?",desc:"The 15M has shown its displacement for this session. Now looking for the reaction entry."},
       ]},
       {group:"Market Reacted To",icon:"🎯",items:[
         {id:"mrt11",title:"15M Liquidity",desc:"Clear swing high/low or equal highs/lows on the 15M chart — price reacted to this liquidity pool."},
@@ -879,24 +881,32 @@
         const checked=group.items.filter(i=>checks[i.id]).length;
         const total=group.items.length;
         const bodyId="grp-body-"+key;
+        // For radio groups show which one is active rather than a count
+        const progressLabel=group.radio
+          ? (group.items.find(i=>checks[i.id])?.title||"None selected")
+          : `${checked}/${total}`;
         return`<div style="padding:0 16px 10px;">
           <div class="checklist-group ${collapsed}" id="grp-${key}">
             <div class="checklist-group-header" data-group-toggle="${bodyId}">
               <span class="checklist-group-title">${group.icon} ${group.group}</span>
               <div style="display:flex;align-items:center;gap:10px;">
-                <span class="checklist-group-progress" id="prog-${key}">${checked}/${total}</span>
+                <span class="checklist-group-progress" id="prog-${key}" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:${group.radio?"10px":"11px"};">${progressLabel}</span>
                 <svg class="group-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
             </div>
             <div class="checklist-group-body" id="${bodyId}">
-              ${group.items.map(item=>this._buildCheckItem(item,checks[item.id])).join("")}
+              ${group.items.map(item=>this._buildCheckItem(item,checks[item.id],!!group.radio)).join("")}
             </div>
           </div>
         </div>`;
       },
-      _buildCheckItem(item,checked){
-        return`<div class="check-item ${checked?"checked":""}" data-check-id="${item.id}">
-          <div class="check-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      _buildCheckItem(item,checked,isRadio=false){
+        // Radio items use a circle indicator; regular items use a checkmark box
+        const boxHtml=isRadio
+          ? `<div class="check-box" style="border-radius:50%;">${checked?`<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#000"/></svg>`:""}</div>`
+          : `<div class="check-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
+        return`<div class="check-item ${checked?"checked":""}" data-check-id="${item.id}" ${isRadio?'data-radio="true"':""}>
+          ${boxHtml}
           <div class="check-text"><div class="check-title">${item.title}</div><div class="check-desc">${item.desc}</div></div>
         </div>`;
       },
@@ -905,12 +915,57 @@
         const autoSave=()=>{s.pair=el.querySelector("#cl-pair").value;s.direction=el.querySelector("#cl-dir").value;};
         ["#cl-pair","#cl-dir"].forEach(sel=>{el.querySelector(sel)?.addEventListener("change",autoSave);});
         el.querySelectorAll("[data-group-toggle]").forEach(hdr=>{hdr.addEventListener("click",()=>{hdr.closest(".checklist-group")?.classList.toggle("collapsed");});});
-        el.querySelectorAll(".check-item").forEach(item=>{item.addEventListener("click",()=>{const id=item.dataset.checkId;s.checks[id]=!s.checks[id];item.classList.toggle("checked",s.checks[id]);this._updateGroupCounts(el);});});
+        el.querySelectorAll(".check-item").forEach(item=>{
+          item.addEventListener("click",()=>{
+            const id=item.dataset.checkId;
+            const isRadio=item.dataset.radio==="true";
+            if(isRadio){
+              // Find the group that owns this item and deselect siblings
+              const group=CHECKLIST_ITEMS.find(g=>g.radio&&g.items.some(i=>i.id===id));
+              if(group){
+                // Deselect all items in this radio group
+                group.items.forEach(gi=>{
+                  s.checks[gi.id]=false;
+                  const sibling=el.querySelector(`[data-check-id="${gi.id}"]`);
+                  if(sibling){
+                    sibling.classList.remove("checked");
+                    // Clear the filled circle inside the radio box
+                    const box=sibling.querySelector(".check-box");
+                    if(box)box.innerHTML="";
+                  }
+                });
+                // Select clicked item (toggle off if already selected)
+                const wasChecked=!item.classList.contains("checked");// after removal above it's always unchecked
+                s.checks[id]=true;
+                item.classList.add("checked");
+                const box=item.querySelector(".check-box");
+                if(box)box.innerHTML=`<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#000"/></svg>`;
+              }
+            } else {
+              s.checks[id]=!s.checks[id];
+              item.classList.toggle("checked",s.checks[id]);
+            }
+            this._updateGroupCounts(el);
+          });
+        });
         el.querySelector("#cl-watchlist-btn")?.addEventListener("click",async()=>{autoSave();if(!s.pair){App.toast("Select an asset first","error");return;}s.status="watching";await DB.saveSetup(s);App.toast("Added to Watchlist!","success");this._current=this._newSetup();App.navigate("watchlist");});
         el.querySelector("#cl-update-btn")?.addEventListener("click",async()=>{autoSave();await DB.saveSetup(s);App.toast("Setup updated","success");});
         el.querySelector("#cl-reset-btn")?.addEventListener("click",()=>{App.confirm("Reset checklist?","All entered data will be cleared.",()=>{this._current=this._newSetup();this.render();});});
       },
-      _updateGroupCounts(el){CHECKLIST_ITEMS.forEach(g=>{const key=this._groupKey(g.group);const checked=g.items.filter(i=>this._current.checks[i.id]).length;const progEl=el.querySelector(`#prog-${key}`);if(progEl)progEl.textContent=`${checked}/${g.items.length}`;});},
+      _updateGroupCounts(el){
+        CHECKLIST_ITEMS.forEach(g=>{
+          const key=this._groupKey(g.group);
+          const progEl=el.querySelector(`#prog-${key}`);
+          if(!progEl)return;
+          if(g.radio){
+            const selected=g.items.find(i=>this._current.checks[i.id]);
+            progEl.textContent=selected?selected.title:"None selected";
+          } else {
+            const checked=g.items.filter(i=>this._current.checks[i.id]).length;
+            progEl.textContent=`${checked}/${g.items.length}`;
+          }
+        });
+      },
       loadSetup(setup){this._current=JSON.parse(JSON.stringify(setup));this.render();},
     };
     window.ChecklistPage=ChecklistPage;
@@ -1013,6 +1068,24 @@
         const panel=list.querySelector(`[data-edit-panel="${setupId}"]`);if(!panel)return;
         CHECKLIST_ITEMS.forEach(g=>{const gc=g.items.filter(i=>setup.checks?.[i.id]).length;const cls=gc===0?"group-count-none":"group-count-some";const el=panel.querySelector(`[data-group-count="${g.group}"]`);if(el){el.textContent=`${gc}/${g.items.length}`;el.className=cls;}});
       },
+      // Detect which entry model group has the most checked items in the setup
+      _detectEntryModel(setup){
+        const modelMap=[
+          {value:"V-Shape Recovery",  ids:["em1a","em1b","em1c","em1d"]},
+          {value:"Order Block",       ids:["em2a","em2b","em2c"]},
+          {value:"iFVG",              ids:["em3a","em3b"]},
+          {value:"iFVG Mitigation",   ids:["em4a","em4b","em4c"]},
+          {value:"FBS",               ids:["em5a","em5b","em5c","em5d","em5e"]},
+          {value:"Flip Pattern",      ids:["em6a","em6b","em6c","em6d","em6e","em6f"]},
+        ];
+        const checks=setup.checks||{};
+        let best=null,bestCount=0;
+        modelMap.forEach(m=>{
+          const count=m.ids.filter(id=>checks[id]).length;
+          if(count>bestCount){bestCount=count;best=m.value;}
+        });
+        return best||""; // returns "" if no entry model items are checked
+      },
       _showTakeModal(setup,el){
         const modal=document.getElementById("input-modal");
         const titleEl=document.getElementById("input-modal-title");
@@ -1020,17 +1093,24 @@
         const okBtn=document.getElementById("input-modal-ok");
         const cancelBtn=document.getElementById("input-modal-cancel");
         titleEl.textContent="📋 Place Trade";
+        // Auto-detect from checklist
+        const detectedModel=this._detectEntryModel(setup);
+        const modelOptions=[
+          {value:"",label:"Select model…"},
+          {value:"V-Shape Recovery",  label:"Model 1 — V-Shape Recovery"},
+          {value:"Order Block",       label:"Model 2 — Order Block Rejection"},
+          {value:"iFVG",              label:"Model 3 — iFVG Entry"},
+          {value:"iFVG Mitigation",   label:"Model 4 — iFVG Mitigation + Rejection"},
+          {value:"FBS",               label:"Model 5 — FBS (Failed to Break Structure)"},
+          {value:"Flip Pattern",      label:"Model 6 — Flip Pattern"},
+        ];
+        const optionsHtml=modelOptions.map(o=>`<option value="${o.value}" ${o.value===detectedModel?"selected":""}>${o.label}</option>`).join("");
+        const autoNote=detectedModel?`<div style="font-size:11px;color:var(--accent);margin-top:4px;">✓ Auto-detected from checklist — you can change this.</div>`:`<div style="font-size:11px;color:var(--text-muted);margin-top:4px;">No entry model items checked yet on the checklist.</div>`;
         bodyEl.innerHTML=`
-          <div class="form-group"><label class="form-label">Entry Model <span style="color:var(--danger)">*</span></label>
-            <select class="form-select" id="tm-model">
-              <option value="">Select model…</option>
-              <option value="V-Shape Recovery">Model 1 — V-Shape Recovery</option>
-              <option value="Order Block">Model 2 — Order Block Rejection</option>
-              <option value="iFVG">Model 3 — iFVG Entry</option>
-              <option value="iFVG Mitigation">Model 4 — iFVG Mitigation + Rejection</option>
-              <option value="FBS">Model 5 — FBS (Failed to Break Structure)</option>
-              <option value="Flip Pattern">Model 6 — Flip Pattern</option>
-            </select>
+          <div class="form-group">
+            <label class="form-label">Entry Model <span style="color:var(--danger)">*</span></label>
+            <select class="form-select" id="tm-model">${optionsHtml}</select>
+            ${autoNote}
           </div>
           <div style="margin-top:4px;">
             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:8px;">🛡️ Risk Management</div>
@@ -1594,11 +1674,20 @@
       showLotTable(){
         const modal=document.getElementById("input-modal");const titleEl=document.getElementById("input-modal-title");const bodyEl=document.getElementById("input-modal-body");const okBtn=document.getElementById("input-modal-ok");const cancelBtn=document.getElementById("input-modal-cancel");
         titleEl.textContent="📊 Lot Size Reference Table";
-        const instruments=[{name:"NAS100",flag:"🇺🇸",desc:"$1 per point / lot",tickVal:1,targets:[500,800,1000,1200],color:"#2979ff"},{name:"S&P500",flag:"🇺🇸",desc:"$1 per point / lot",tickVal:1,targets:[85,135,170,200],color:"#00e676"},{name:"DAX40",flag:"🇩🇪",desc:"€1 per point / lot",tickVal:1,targets:[200,320,400,480],color:"#ffd600"},{name:"FTSE100",flag:"🇬🇧",desc:"£1 per point / lot",tickVal:1,targets:[150,240,300,360],color:"#ff4757"}];
+        const instruments=[
+          {name:"NAS100",  flag:"🇺🇸",desc:"$1 per point / lot",    tickVal:1,    targets:[500,800,1000,1200], color:"#2979ff"},
+          {name:"S&P500",  flag:"🇺🇸",desc:"$1 per point / lot",    tickVal:1,    targets:[85,135,170,200],    color:"#00e676"},
+          {name:"US30",    flag:"🇺🇸",desc:"$1 per point / lot",    tickVal:1,    targets:[200,400,600,800],   color:"#ffa502"},
+          {name:"DAX40",   flag:"🇩🇪",desc:"€1 per point / lot",    tickVal:1,    targets:[200,320,400,480],   color:"#ffd600"},
+          {name:"FTSE100", flag:"🇬🇧",desc:"£1 per point / lot",    tickVal:1,    targets:[150,240,300,360],   color:"#ff4757"},
+          {name:"XAUUSD",  flag:"🥇",desc:"$100 per $1 / lot",      tickVal:100,  targets:[1,2,5,10],          color:"#f5c518"},
+          {name:"USOUSD",  flag:"🛢️",desc:"$1000 per $1 / lot",     tickVal:1000, targets:[0.5,1,2,3],         color:"#8b5cf6"},
+          {name:"EURUSD",  flag:"🇪🇺",desc:"$10 per pip / lot",     tickVal:10,   targets:[10,20,50,100],      color:"#60a5fa"},
+        ];
         const lots=[0.1,0.5,1.0,2.0,3.0];
-        let tabs=instruments.map((ins,i)=>`<button class="lot-tab ${i===0?"active":""}" data-ins="${i}">${ins.flag} ${ins.name}</button>`).join("");
+        let tabs=`<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--bg-3);border-radius:10px;padding:4px;margin-bottom:14px;">${instruments.map((ins,i)=>`<button class="lot-tab ${i===0?"active":""}" data-ins="${i}" style="font-size:10px;">${ins.flag} ${ins.name}</button>`).join("")}</div>`;
         let tables=instruments.map((ins,i)=>`<div class="lot-table-wrap ${i===0?"":"hidden"}" data-ins-panel="${i}"><div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;text-align:center;">${ins.desc}</div><div style="overflow-x:auto;"><table class="lot-tbl"><thead><tr><th>Ticks</th>${lots.map(l=>`<th>${l} lot</th>`).join("")}</tr></thead><tbody>${ins.targets.map(t=>`<tr><td style="font-weight:700;color:${ins.color};">${t}</td>${lots.map(l=>`<td>$${(t*ins.tickVal*l).toFixed(2)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`).join("");
-        bodyEl.innerHTML=`<div class="lot-tabs">${tabs}</div>${tables}`;
+        bodyEl.innerHTML=`${tabs}${tables}`;
         bodyEl.querySelectorAll(".lot-tab").forEach(btn=>{btn.addEventListener("click",()=>{bodyEl.querySelectorAll(".lot-tab").forEach(b=>b.classList.remove("active"));bodyEl.querySelectorAll("[data-ins-panel]").forEach(p=>p.classList.add("hidden"));btn.classList.add("active");bodyEl.querySelector(`[data-ins-panel="${btn.dataset.ins}"]`)?.classList.remove("hidden");});});
         modal.classList.remove("hidden");
         const newOk=okBtn.cloneNode(true);okBtn.parentNode.replaceChild(newOk,okBtn);const newCancel=cancelBtn.cloneNode(true);cancelBtn.parentNode.replaceChild(newCancel,cancelBtn);
