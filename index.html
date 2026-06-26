@@ -480,6 +480,17 @@
       /* CHECKLIST SETUP CARD */
       .checklist-setup-card{background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);margin:16px;padding:16px;}
       .checklist-actions{display:flex;flex-direction:column;gap:10px;padding:0 16px 16px;}
+
+      /* MARKET REACTED TO GRID */
+      .mrt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 0;}
+      .mrt-tile{background:var(--bg-3);border:1px solid var(--border);border-radius:10px;padding:10px 8px;display:flex;flex-direction:column;gap:3px;cursor:pointer;transition:all var(--t-fast);position:relative;}
+      .mrt-tile.checked{background:rgba(0,230,118,.1);border-color:rgba(0,230,118,.4);}
+      .mrt-tile-name{font-size:11px;font-weight:700;color:var(--text-primary);line-height:1.2;}
+      .mrt-tile.checked .mrt-tile-name{color:var(--accent);}
+      .mrt-tile-desc{font-size:9.5px;color:var(--text-muted);line-height:1.35;}
+      .mrt-check-dot{position:absolute;top:6px;right:6px;width:14px;height:14px;border-radius:50%;background:var(--accent);display:none;align-items:center;justify-content:center;}
+      .mrt-tile.checked .mrt-check-dot{display:flex;}
+      .mrt-check-dot svg{width:8px;height:8px;}
     </style>
   </head>
   <body>
@@ -647,15 +658,13 @@
     window.DB=DB;
 
     /* ============================================================
-       Date range helpers for scoped goal progress
+       Date range helpers
     ============================================================ */
     function getPeriodRange(period){
       const now=new Date();
       let start,end;
       if(period==="weekly"){
-        // Start of current week (Monday)
-        const day=now.getDay();
-        const diff=day===0?-6:1-day;
+        const day=now.getDay();const diff=day===0?-6:1-day;
         start=new Date(now);start.setHours(0,0,0,0);start.setDate(now.getDate()+diff);
         end=new Date(start);end.setDate(start.getDate()+6);end.setHours(23,59,59,999);
       } else if(period==="monthly"){
@@ -677,7 +686,7 @@
     }
 
     /* ============================================================
-       HOME PAGE — date-scoped goal progress
+       HOME PAGE
     ============================================================ */
     const HomePage={
       async render(){
@@ -738,7 +747,6 @@
       _goalRow(label,pct,goal,scope){
         if(!goal)return"";
         const barColor=pct>=100?"var(--accent)":pct>=60?"var(--accent)":pct>=30?"var(--warning)":"var(--danger)";
-        const{wins,total}=this._scopeCache||{wins:0,total:0};
         return`<div class="home-goal-row">
           <div class="home-goal-meta">
             <span class="home-goal-name">${label} <span style="font-size:10px;color:var(--text-muted);font-weight:400;">${scope}</span></span>
@@ -751,10 +759,8 @@
     window.HomePage=HomePage;
 
     /* ============================================================
-       CHECKLIST ITEMS — Updated with new sections and models
+       CHECKLIST ITEMS
     ============================================================ */
-    // Groups collapsed by default. Keys are derived by _groupKey() which replaces
-    // spaces/slashes/dashes with underscores and strips leading/trailing underscores.
     const COLLAPSED_BY_DEFAULT=new Set([
       "Entry_Model_1_V_Shape_Recovery",
       "Entry_Model_2_Order_Block_Rejection",
@@ -765,29 +771,31 @@
     ]);
 
     const CHECKLIST_ITEMS=[
-      // ── SESSION — radio style: only one can be active ────────────
+      // ── SESSION — radio style ────────────────────────────────────
       {group:"Session",icon:"🕐",radio:true,items:[
-        {id:"sess1",title:"London Session",desc:"Trading during the London session (12:00–17:00 MUT / 08:00–13:00 BST)."},
-        {id:"sess2",title:"New York Session",desc:"Trading during the New York session (16:30–20:00 MUT / 12:30–16:00 BST)."},
+        {id:"sess1",title:"London Session",desc:"Trading during the London session (11:00–19:00 MUT / 07:00–15:00 UTC)."},
+        {id:"sess2",title:"New York Session — Forex",desc:"Trading during the NY forex session (16:00–01:00 MUT / 12:00–21:00 UTC)."},
+        {id:"sess3",title:"New York Session — Stocks",desc:"Trading during the NY stock session (17:30–00:30 MUT / 13:30–20:30 UTC)."},
       ]},
-      // ── 15M CONFIRMATION — Asian IB first ────────────────────────
+      // ── 15M CONFIRMATION ────────────────────────────────────────
       {group:"15M Confirmation",icon:"📉",items:[
-        {id:"htf4",title:"Asian Session Initial Balance Marked",desc:"The high and low of the first hour of the Asian session (00:00–01:00 MUT) are clearly marked as the initial balance range."},
-        {id:"htf1",title:"Is the 15-Minute Played Out?",desc:"The 15M has shown its displacement for this session. Now looking for the reaction entry."},
+        {id:"htf4",title:"Asian Session Initial Balance Marked",desc:"The high and low of the Asian session (02:00–03:00 MUT) are clearly marked as the initial balance range."},
+        {id:"htf1",title:"Is the 15-Minute Played Out?",desc:"The 15M has shown its displacement for this session."},
       ]},
-      {group:"Market Reacted To",icon:"🎯",items:[
-        {id:"mrt11",title:"15M Liquidity",desc:"Clear swing high/low or equal highs/lows on the 15M chart — price reacted to this liquidity pool."},
-        {id:"mrt12",title:"15M FVG",desc:"A Fair Value Gap (3-candle imbalance) on the 15M — price reacted into or from this FVG."},
-        {id:"mrt1",title:"Session's Open",desc:"Price has reacted to the opening price of the current active session (London or NY open level)."},
-        {id:"mrt2",title:"Session's Close",desc:"Price has reacted to the prior session's closing price level."},
-        {id:"mrt3",title:"Session's High",desc:"Price has swept or reacted to the prior session's high."},
-        {id:"mrt4",title:"Session's Low",desc:"Price has swept or reacted to the prior session's low."},
-        {id:"mrt5",title:"Value Area High (VAH)",desc:"Price reached and reacted to the Value Area High from the volume profile."},
-        {id:"mrt6",title:"Value Area Low (VAL)",desc:"Price reached and reacted to the Value Area Low from the volume profile."},
-        {id:"mrt7",title:"Point of Control (POC)",desc:"Price reacted to the POC — highest traded volume node on the volume profile."},
-        {id:"mrt8",title:"Asian Session Initial Balance",desc:"Price has swept or reacted to the Asian session high or low (initial balance boundaries)."},
-        {id:"mrt9",title:"Discount / Premium Zone",desc:"Price is in a premium zone (above 50% of range — look for shorts) or discount zone (below 50% — look for longs)."},
-        {id:"mrt10",title:"Gaps",desc:"Price has reacted to an open gap or fair value gap from a prior session or daily candle."},
+      // ── MARKET REACTED TO — rendered as grid ────────────────────
+      {group:"Market Reacted To",icon:"🎯",grid:true,items:[
+        {id:"mrt11",title:"15M Liquidity",desc:"Swing H/L or equal highs/lows on the 15M."},
+        {id:"mrt12",title:"15M FVG",desc:"Fair Value Gap on the 15M chart."},
+        {id:"mrt1", title:"Session Open",desc:"Opening price of the active session."},
+        {id:"mrt2", title:"Session Close",desc:"Prior session closing price level."},
+        {id:"mrt3", title:"Session High",desc:"Prior session high swept or tested."},
+        {id:"mrt4", title:"Session Low",desc:"Prior session low swept or tested."},
+        {id:"mrt5", title:"VAH",desc:"Value Area High from volume profile."},
+        {id:"mrt6", title:"VAL",desc:"Value Area Low from volume profile."},
+        {id:"mrt7", title:"POC",desc:"Point of Control — highest volume node."},
+        {id:"mrt8", title:"Asian IB",desc:"Asian session initial balance boundary (02:00–03:00 MUT)."},
+        {id:"mrt9", title:"Discount / Premium",desc:"Premium zone (above 50%) = shorts. Discount (below 50%) = longs."},
+        {id:"mrt10",title:"Gaps",desc:"Open gaps or FVGs from prior sessions."},
       ]},
       {group:"Entry Model 1 — V-Shape Recovery",icon:"⚡",items:[
         {id:"em1a",title:"Key Level Tapped",desc:"Price tapped the key level (Liquidity / FVG / VAL / VAH / POC / Session level)."},
@@ -814,15 +822,14 @@
         {id:"em5b",title:"Breakout Attempt Observed",desc:"Price makes a clear attempt to break the identified structure level — candle closes beyond the level."},
         {id:"em5c",title:"Breakout Failed — Price Reverses",desc:"Price fails to sustain the breakout and quickly reverses back through the structure level, trapping breakout traders."},
         {id:"em5d",title:"Confirmation Candle Closed in Opposite Direction",desc:"A confirmation candle closes decisively in the direction of the failure — entry signal confirmed."},
-        {id:"em5e",title:"SL Set Beyond the Failed Breakout Wick",desc:"Stop loss placed beyond the wick of the failed breakout candle. Target minimum 1:2 RR."},
       ]},
       {group:"Entry Model 6 — Flip Pattern",icon:"🔃",items:[
-        {id:"em6a",title:"Original Support/Resistance Level Identified",desc:"A clear S/R level has been identified that price previously respected multiple times."},
-        {id:"em6b",title:"Level Broken with Conviction",desc:"Price breaks the S/R level with a strong, impulsive displacement candle — not a slow grind."},
-        {id:"em6c",title:"Level Has Flipped (Role Reversal)",desc:"The broken support now acts as resistance (or broken resistance now acts as support) — the flip is confirmed."},
-        {id:"em6d",title:"Price Returns to the Flipped Level",desc:"Price pulls back to test the newly flipped level for the first time after the breakout."},
-        {id:"em6e",title:"Rejection at Flipped Level Confirmed",desc:"Price shows a clear rejection (wick, pattern, or strong candle) at the flipped level — entry signal confirmed."},
-        {id:"em6f",title:"SL Beyond the Flipped Level",desc:"Stop loss placed beyond the flipped level (old S/R). Target minimum 1:2 RR at next liquidity."},
+        {id:"em6a",title:"Demand / Supply Zone Identified",desc:"A clear demand zone (support) or supply zone (resistance) has been identified — price has bounced or rejected from it multiple times."},
+        {id:"em6b",title:"Zone Broken with Conviction",desc:"Price breaks through the zone with a strong, impulsive displacement candle — the zone fails to hold."},
+        {id:"em6c",title:"Role Reversal Confirmed",desc:"The broken demand zone now acts as a new supply zone (or broken supply now acts as demand) — the flip is confirmed by price respecting the new role."},
+        {id:"em6d",title:"Price Returns to the Flipped Zone",desc:"Price pulls back to test the newly flipped zone for the first time after the breakout."},
+        {id:"em6e",title:"Rejection at Flipped Zone Confirmed",desc:"Price shows a clear rejection at the flipped zone — former demand repels price as supply (or vice versa). Entry confirmed."},
+        {id:"em6f",title:"SL Beyond the Flipped Zone",desc:"Stop loss placed beyond the flipped zone. Target minimum 1:2 RR at the next significant liquidity or structure level."},
       ]},
     ];
 
@@ -850,8 +857,12 @@
               <select class="form-select" id="cl-pair">
                 <option value="NAS100" ${(s.pair||"NAS100")==="NAS100"?"selected":""}>🇺🇸 NAS100</option>
                 <option value="S&P500" ${s.pair==="S&P500"?"selected":""}>🇺🇸 S&P500</option>
+                <option value="US30" ${s.pair==="US30"?"selected":""}>🇺🇸 US30</option>
                 <option value="DAX40" ${s.pair==="DAX40"?"selected":""}>🇩🇪 DAX40</option>
                 <option value="FTSE100" ${s.pair==="FTSE100"?"selected":""}>🇬🇧 FTSE100</option>
+                <option value="XAUUSD" ${s.pair==="XAUUSD"?"selected":""}>🥇 XAUUSD</option>
+                <option value="USOUSD" ${s.pair==="USOUSD"?"selected":""}>🛢️ USOUSD</option>
+                <option value="EURUSD" ${s.pair==="EURUSD"?"selected":""}>🇪🇺 EURUSD</option>
               </select>
             </div>
             <div class="form-group"><label class="form-label">Bias (4H + 15M)</label>
@@ -878,19 +889,45 @@
       _buildGroup(group,checks){
         const key=this._groupKey(group.group);
         const collapsed=COLLAPSED_BY_DEFAULT.has(key)?"collapsed":"";
-        const checked=group.items.filter(i=>checks[i.id]).length;
-        const total=group.items.length;
         const bodyId="grp-body-"+key;
-        // For radio groups show which one is active rather than a count
-        const progressLabel=group.radio
+
+        // Grid groups (Market Reacted To)
+        if(group.grid){
+          const checked=group.items.filter(i=>checks[i.id]).length;
+          const total=group.items.length;
+          return`<div style="padding:0 16px 10px;">
+            <div class="checklist-group" id="grp-${key}">
+              <div class="checklist-group-header" data-group-toggle="${bodyId}">
+                <span class="checklist-group-title">${group.icon} ${group.group}</span>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <span class="checklist-group-progress" id="prog-${key}">${checked}/${total}</span>
+                  <svg class="group-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+              </div>
+              <div class="checklist-group-body" id="${bodyId}" style="padding:0 16px 12px;">
+                <div class="mrt-grid">
+                  ${group.items.map(item=>`
+                    <div class="mrt-tile ${checks[item.id]?"checked":""}" data-mrt-id="${item.id}">
+                      <div class="mrt-check-dot"><svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#000" stroke-width="3" stroke-linecap="round"/></svg></div>
+                      <div class="mrt-tile-name">${item.title}</div>
+                      <div class="mrt-tile-desc">${item.desc}</div>
+                    </div>`).join("")}
+                </div>
+              </div>
+            </div>
+          </div>`;
+        }
+
+        // Regular groups
+        const checked=group.radio
           ? (group.items.find(i=>checks[i.id])?.title||"None selected")
-          : `${checked}/${total}`;
+          : `${group.items.filter(i=>checks[i.id]).length}/${group.items.length}`;
         return`<div style="padding:0 16px 10px;">
           <div class="checklist-group ${collapsed}" id="grp-${key}">
             <div class="checklist-group-header" data-group-toggle="${bodyId}">
               <span class="checklist-group-title">${group.icon} ${group.group}</span>
               <div style="display:flex;align-items:center;gap:10px;">
-                <span class="checklist-group-progress" id="prog-${key}" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:${group.radio?"10px":"11px"};">${progressLabel}</span>
+                <span class="checklist-group-progress" id="prog-${key}" style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:${group.radio?"10px":"11px"};">${checked}</span>
                 <svg class="group-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
             </div>
@@ -901,7 +938,6 @@
         </div>`;
       },
       _buildCheckItem(item,checked,isRadio=false){
-        // Radio items use a circle indicator; regular items use a checkmark box
         const boxHtml=isRadio
           ? `<div class="check-box" style="border-radius:50%;">${checked?`<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="#000"/></svg>`:""}</div>`
           : `<div class="check-box"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`;
@@ -915,27 +951,29 @@
         const autoSave=()=>{s.pair=el.querySelector("#cl-pair").value;s.direction=el.querySelector("#cl-dir").value;};
         ["#cl-pair","#cl-dir"].forEach(sel=>{el.querySelector(sel)?.addEventListener("change",autoSave);});
         el.querySelectorAll("[data-group-toggle]").forEach(hdr=>{hdr.addEventListener("click",()=>{hdr.closest(".checklist-group")?.classList.toggle("collapsed");});});
+
+        // Grid tiles (Market Reacted To)
+        el.querySelectorAll(".mrt-tile[data-mrt-id]").forEach(tile=>{
+          tile.addEventListener("click",()=>{
+            const id=tile.dataset.mrtId;
+            s.checks[id]=!s.checks[id];
+            tile.classList.toggle("checked",s.checks[id]);
+            this._updateGroupCounts(el);
+          });
+        });
+
         el.querySelectorAll(".check-item").forEach(item=>{
           item.addEventListener("click",()=>{
             const id=item.dataset.checkId;
             const isRadio=item.dataset.radio==="true";
             if(isRadio){
-              // Find the group that owns this item and deselect siblings
               const group=CHECKLIST_ITEMS.find(g=>g.radio&&g.items.some(i=>i.id===id));
               if(group){
-                // Deselect all items in this radio group
                 group.items.forEach(gi=>{
                   s.checks[gi.id]=false;
                   const sibling=el.querySelector(`[data-check-id="${gi.id}"]`);
-                  if(sibling){
-                    sibling.classList.remove("checked");
-                    // Clear the filled circle inside the radio box
-                    const box=sibling.querySelector(".check-box");
-                    if(box)box.innerHTML="";
-                  }
+                  if(sibling){sibling.classList.remove("checked");const box=sibling.querySelector(".check-box");if(box)box.innerHTML="";}
                 });
-                // Select clicked item (toggle off if already selected)
-                const wasChecked=!item.classList.contains("checked");// after removal above it's always unchecked
                 s.checks[id]=true;
                 item.classList.add("checked");
                 const box=item.querySelector(".check-box");
@@ -1068,23 +1106,19 @@
         const panel=list.querySelector(`[data-edit-panel="${setupId}"]`);if(!panel)return;
         CHECKLIST_ITEMS.forEach(g=>{const gc=g.items.filter(i=>setup.checks?.[i.id]).length;const cls=gc===0?"group-count-none":"group-count-some";const el=panel.querySelector(`[data-group-count="${g.group}"]`);if(el){el.textContent=`${gc}/${g.items.length}`;el.className=cls;}});
       },
-      // Detect which entry model group has the most checked items in the setup
       _detectEntryModel(setup){
         const modelMap=[
           {value:"V-Shape Recovery",  ids:["em1a","em1b","em1c","em1d"]},
           {value:"Order Block",       ids:["em2a","em2b","em2c"]},
           {value:"iFVG",              ids:["em3a","em3b"]},
           {value:"iFVG Mitigation",   ids:["em4a","em4b","em4c"]},
-          {value:"FBS",               ids:["em5a","em5b","em5c","em5d","em5e"]},
+          {value:"FBS",               ids:["em5a","em5b","em5c","em5d"]},
           {value:"Flip Pattern",      ids:["em6a","em6b","em6c","em6d","em6e","em6f"]},
         ];
         const checks=setup.checks||{};
         let best=null,bestCount=0;
-        modelMap.forEach(m=>{
-          const count=m.ids.filter(id=>checks[id]).length;
-          if(count>bestCount){bestCount=count;best=m.value;}
-        });
-        return best||""; // returns "" if no entry model items are checked
+        modelMap.forEach(m=>{const count=m.ids.filter(id=>checks[id]).length;if(count>bestCount){bestCount=count;best=m.value;}});
+        return best||"";
       },
       _showTakeModal(setup,el){
         const modal=document.getElementById("input-modal");
@@ -1093,7 +1127,6 @@
         const okBtn=document.getElementById("input-modal-ok");
         const cancelBtn=document.getElementById("input-modal-cancel");
         titleEl.textContent="📋 Place Trade";
-        // Auto-detect from checklist
         const detectedModel=this._detectEntryModel(setup);
         const modelOptions=[
           {value:"",label:"Select model…"},
@@ -1253,6 +1286,7 @@
         const setupThumbs=(e.screenshots||[]).slice(0,3).map(img=>`<img src="${img}" class="watch-thumb" data-view-img="${img}" alt="ss" loading="lazy"/>`).join("");
         const resultThumbs=[...(isClosed&&e.status==="profit"?e.profitScreenshots||[]:[]),...(isClosed&&e.status==="loss"?e.lossScreenshots||[]:[])].slice(0,3).map(img=>`<img src="${img}" class="watch-thumb" data-view-img="${img}" alt="result ss" loading="lazy"/>`).join("");
         const pnlDisplay=e.status==="profit"&&e.profitAmount?`<span style="font-size:12px;font-weight:700;color:var(--accent);font-family:var(--font-mono);">+$${e.profitAmount}</span>`:e.status==="loss"&&e.lossAmount?`<span style="font-size:12px;font-weight:700;color:var(--danger);font-family:var(--font-mono);">-$${e.lossAmount}</span>`:"";
+        // Delete button always on far right; profit/loss take remaining space
         return`<div class="journal-card" data-entry-id="${e.id}">
           <div class="journal-card-header"><div class="dir-dot ${dirClass}">${dirSym}</div><span class="journal-card-pair">${e.pair||"—"}</span>${pnlDisplay}<span class="badge badge-${e.status}" style="margin-left:auto;">${e.status}</span></div>
           <div class="journal-card-body"><div class="journal-card-meta">
@@ -1267,7 +1301,7 @@
             ${e.status!=="invalidated"?`
               <button class="btn btn-sm jnl-profit" data-id="${e.id}" ${isClosed?"disabled":""} style="flex:1;background:${e.status==="profit"?"var(--accent)":"var(--bg-3)"};color:${e.status==="profit"?"#000":"var(--accent)"};border:1.5px solid var(--accent);${isClosed&&e.status!=="profit"?"opacity:0.35;":""}">✓ Profit</button>
               <button class="btn btn-sm jnl-loss" data-id="${e.id}" ${isClosed?"disabled":""} style="flex:1;background:${e.status==="loss"?"var(--danger)":"var(--bg-3)"};color:${e.status==="loss"?"#fff":"var(--danger)"};border:1.5px solid var(--danger);${isClosed&&e.status!=="loss"?"opacity:0.35;":""}">✗ Loss</button>`:""}
-            <button class="btn btn-ghost btn-sm jnl-delete" data-id="${e.id}" style="color:var(--danger);padding:0 12px;">
+            <button class="btn btn-ghost btn-sm jnl-delete" data-id="${e.id}" style="color:var(--danger);padding:0 12px;margin-left:auto;">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><polyline points="3 6 5 6 21 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 11v6M14 11v6M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
             </button>
           </div>
@@ -1422,7 +1456,7 @@
     window.AnalyticsPage=AnalyticsPage;
 
     /* ============================================================
-       STRATEGY PAGE — Updated with FBS and Flip Pattern
+       STRATEGY PAGE
     ============================================================ */
     const StrategyPage={
       render(){
@@ -1438,13 +1472,18 @@
             <div class="strategy-card" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <div style="background:rgba(41,121,255,.08);border:1px solid rgba(41,121,255,.25);border-radius:12px;padding:14px;">
                 <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:#2979ff;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">London</div>
-                <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">12:00 – 17:00 MUT</div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">11:00 – 19:00 MUT</div>
                 <div style="font-size:11.5px;color:var(--text-muted);line-height:1.5;">Major EUR/GBP liquidity — sweeps happen at the open.</div>
               </div>
               <div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);border-radius:12px;padding:14px;">
-                <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">New York</div>
-                <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">16:30 – 20:00 MUT</div>
-                <div style="font-size:11.5px;color:var(--text-muted);line-height:1.5;">Best setups in the first 90 min after NYSE open.</div>
+                <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">New York — Forex</div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">16:00 – 01:00 MUT</div>
+                <div style="font-size:11.5px;color:var(--text-muted);line-height:1.5;">Best setups in the first 90 min after open.</div>
+              </div>
+              <div style="background:rgba(255,165,2,.08);border:1px solid rgba(255,165,2,.25);border-radius:12px;padding:14px;grid-column:1/-1;">
+                <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--warning);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">New York — Stocks</div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">17:30 – 00:30 MUT</div>
+                <div style="font-size:11.5px;color:var(--text-muted);line-height:1.5;">NYSE open — focus on indices (NAS100, S&P500, US30).</div>
               </div>
             </div>
           </div>
@@ -1475,7 +1514,7 @@
               <div class="strategy-steps">
                 <div class="strategy-step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Is the 15M Played Out?</div><div class="step-desc">Has the 15M shown its displacement for this session? If yes, look for the reaction entry. If no — wait.</div></div></div>
                 <div class="strategy-step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Spot Liquidity & FVG on 15M</div><div class="step-desc">Identify swing highs/lows, equal H/L, or an unmitigated FVG on the 15M — key targets for price to seek.</div></div></div>
-                <div class="strategy-step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Mark Asian Session Initial Balance</div><div class="step-desc">Mark the high and low of the Asian session (00:00–08:00 MUT) as the initial balance range. These levels often act as magnets or rejection zones for London and NY sessions.</div></div></div>
+                <div class="strategy-step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Mark Asian Session Initial Balance</div><div class="step-desc">Mark the high and low of the Asian session (02:00–03:00 MUT) as the initial balance range. These levels often act as magnets or rejection zones during London and NY sessions.</div></div></div>
                 <div class="strategy-step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Drop to 1M for Entry</div><div class="step-desc">Once 15M is confirmed, drop to 1M to find the precise entry using one of the six models.</div></div></div>
               </div>
             </div>
@@ -1485,8 +1524,8 @@
             <div class="strategy-section-title">Step 4 — Market Reacted To</div>
             <div class="strategy-card">
               <p style="margin-bottom:12px;">Before entering, confirm that price has <strong>reacted to a key level</strong>. The more of these that align, the stronger the setup:</p>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-                ${[["Session's Open","Opening price of active session"],["Session's Close","Prior session's closing level"],["Session's High","Prior session high — swept or tested"],["Session's Low","Prior session low — swept or tested"],["VAH","Value Area High — resistance zone"],["VAL","Value Area Low — support zone"],["POC","Point of Control — highest volume node"],["Asian IB","Asian session initial balance boundary"],["Discount/Premium","Sub-50% range = discount; above 50% = premium"],["Gaps","Open gaps or FVGs from prior sessions"]].map(([n,d])=>`<div style="padding:8px 10px;background:var(--bg-3);border-radius:8px;border:1px solid var(--border);"><div style="font-size:11px;font-weight:700;color:var(--text-primary);">${n}</div><div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;">${d}</div></div>`).join("")}
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                ${[["Session Open","Opening price of active session"],["Session Close","Prior session closing level"],["Session High","Prior session high — swept or tested"],["Session Low","Prior session low — swept or tested"],["VAH","Value Area High — resistance zone"],["VAL","Value Area Low — support zone"],["POC","Point of Control — highest volume node"],["Asian IB","Asian session initial balance (02:00–03:00 MUT)"],["Discount/Premium","Below 50% = discount (longs); above 50% = premium (shorts)"],["15M Liquidity","Swing H/L or equal highs/lows on 15M"],["15M FVG","Fair Value Gap on the 15M chart"],["Gaps","Open gaps or FVGs from prior sessions"]].map(([n,d])=>`<div style="padding:8px 10px;background:var(--bg-3);border-radius:8px;border:1px solid var(--border);"><div style="font-size:11px;font-weight:700;color:var(--text-primary);">${n}</div><div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;">${d}</div></div>`).join("")}
               </div>
             </div>
           </div>
@@ -1511,21 +1550,20 @@
                 <div class="entry-model-step">Price makes a breakout attempt — candle closes beyond the level</div>
                 <div class="entry-model-step">Breakout <strong>fails</strong> — price quickly reverses back through the structure, trapping breakout traders</div>
                 <div class="entry-model-step">Confirmation candle closes decisively in the direction of the failure — entry signal confirmed</div>
-                <div class="entry-model-step">SL beyond the failed breakout wick. TP minimum 1:2 RR targeting the opposing structure.</div>
               </div>
             </div>
 
             <div class="entry-model-card" style="border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.04);">
               <div class="entry-model-num" style="color:#a78bfa;">Model 06</div>
-              <div class="entry-model-name">Flip Pattern — Support/Resistance Role Reversal</div>
-              <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Old support becomes new resistance (and vice versa)</div>
+              <div class="entry-model-name">Flip Pattern — Demand/Supply Role Reversal</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">A broken demand zone becomes supply (and vice versa)</div>
               <div class="entry-model-steps">
-                <div class="entry-model-step">Original S/R level identified — price has respected it multiple times</div>
-                <div class="entry-model-step">Level broken with a strong, impulsive displacement candle</div>
-                <div class="entry-model-step">Broken support now acts as resistance (or broken resistance now acts as support) — role reversal confirmed</div>
-                <div class="entry-model-step">Price pulls back to test the newly flipped level for the first time</div>
-                <div class="entry-model-step">Clear rejection at the flipped level (wick, pattern, or strong candle) — entry confirmed</div>
-                <div class="entry-model-step">SL beyond the flipped level. TP min 1:2 RR at next liquidity or structure level.</div>
+                <div class="entry-model-step">A clear demand zone (support) or supply zone (resistance) identified — price has bounced or rejected from it multiple times</div>
+                <div class="entry-model-step">Zone broken with a strong, impulsive displacement candle — the zone fails to hold</div>
+                <div class="entry-model-step">Role reversal confirmed — broken demand now acts as new supply (or broken supply now acts as new demand)</div>
+                <div class="entry-model-step">Price pulls back to test the newly flipped zone for the first time after the breakout</div>
+                <div class="entry-model-step">Clear rejection at the flipped zone — former demand repels price as supply (or vice versa). Entry confirmed.</div>
+                <div class="entry-model-step">SL beyond the flipped zone. TP min 1:2 RR at the next significant liquidity or structure level.</div>
               </div>
             </div>
           </div>
@@ -1648,7 +1686,7 @@
     window.App=App;
 
     /* ============================================================
-       HOME FAB — Lot Table + Economic Calendar
+       HOME FAB
     ============================================================ */
     const HomeFab={
       _open:false,
