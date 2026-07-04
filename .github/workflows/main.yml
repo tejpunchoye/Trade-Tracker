@@ -1,0 +1,3 @@
+- name: Cancel deployment
+  if: failure()   # only run if something actually failed
+  run: ...
