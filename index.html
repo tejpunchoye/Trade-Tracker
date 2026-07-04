@@ -805,6 +805,41 @@ const AnalyticsPage={
     const totalLoss=closed.filter(t=>t.status==="loss").reduce((s,t)=>s+parseFloat(t.amount||0),0);
     const net=totalWin-totalLoss;
 
+    // Entry model breakdown
+    const emMap={
+      em1:{name:"V-Shape Recovery",w:0,l:0},
+      em2:{name:"Order Block",w:0,l:0},
+      em3:{name:"iFVG Entry",w:0,l:0},
+      em4:{name:"iFVG Mitigation",w:0,l:0},
+      em5:{name:"FBS",w:0,l:0},
+      em6:{name:"Flip Pattern",w:0,l:0},
+    };
+    closed.forEach(t=>{
+      if(t.entryModel&&emMap[t.entryModel]){
+        if(t.status==="profit")emMap[t.entryModel].w++;
+        else emMap[t.entryModel].l++;
+      }
+    });
+    const emRowsHtml=Object.entries(emMap).map(([,m])=>{
+      const tot=m.w+m.l;
+      const wr=tot>0?Math.round((m.w/tot)*100):0;
+      const barW=wr;
+      const barColor=wr>=60?"var(--accent)":wr>=40?"var(--warning)":"var(--danger)";
+      return`<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-3);border-radius:10px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:12px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</div>
+          <div style="height:4px;background:var(--bg-4);border-radius:4px;margin-top:5px;overflow:hidden;">
+            <div style="height:100%;width:${barW}%;background:${barColor};border-radius:4px;transition:width .6s ease;"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-shrink:0;text-align:center;">
+          <div><span style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--accent);display:block;">${m.w}</span><span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;">W</span></div>
+          <div><span style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:var(--danger);display:block;">${m.l}</span><span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;">L</span></div>
+          <div><span style="font-family:var(--font-mono);font-size:14px;font-weight:700;color:${barColor};display:block;">${tot>0?wr+"%":"—"}</span><span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;">WR</span></div>
+        </div>
+      </div>`;
+    }).join("");
+
     el.innerHTML=`
       <div class="section-header">
         <div><div class="section-title">Analytics</div><div class="section-sub">All-time performance</div></div>
@@ -826,6 +861,10 @@ const AnalyticsPage={
         <div class="pnl-sum-cell"><span class="pnl-sum-val" style="color:${net>=0?"var(--accent)":"var(--danger)"};">${net>=0?"+":""}$${net.toFixed(2)}</span><span class="pnl-sum-lbl">Net P&L</span></div>
       </div>
       <div class="cal-card" id="cal-card">${this._buildCalendar(closed)}</div>
+      <div style="margin:0 16px 12px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:10px;">Entry Model Performance</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">${emRowsHtml}</div>
+      </div>
       <div style="height:80px;"></div>`;
 
     this._bindCalNav(el,closed);
