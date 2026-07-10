@@ -320,6 +320,25 @@
     @media(min-width:480px){#app{border-left:1px solid var(--border);border-right:1px solid var(--border);box-shadow:var(--shadow-lg);}}
     .hidden{display:none!important;}
     .mono{font-family:var(--font-mono);}
+
+    /* ── ASSET PICKER DRAWER ── */
+    @keyframes drawerUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .asset-section-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);padding:4px 4px 8px;display:flex;align-items:center;gap:7px;}
+    .asset-section-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .asset-row{display:flex;align-items:center;gap:12px;padding:12px 12px;border-radius:12px;cursor:pointer;transition:background var(--t-fast);border:1px solid var(--border);margin-bottom:7px;background:var(--card-bg);}
+    .asset-row:hover{background:var(--card-hover);border-color:var(--accent);}
+    .asset-flag{font-size:24px;line-height:1;flex-shrink:0;width:32px;text-align:center;}
+    .asset-name{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--text-primary);}
+    .asset-desc{font-size:11px;color:var(--text-muted);margin-top:1px;}
+    .asset-session-tag{margin-left:auto;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+    .tag-london{background:rgba(41,121,255,.15);color:#5c9eff;border:1px solid rgba(41,121,255,.25);}
+    .tag-ny-stock{background:rgba(0,230,118,.12);color:var(--accent);border:1px solid rgba(0,230,118,.25);}
+    .tag-ny-forex{background:rgba(255,165,2,.12);color:var(--warning);border:1px solid rgba(255,165,2,.25);}
+    .no-session-msg{text-align:center;padding:28px 16px 20px;color:var(--text-muted);font-size:14px;line-height:1.6;}
+
+    /* ── ENTRY MODEL GREYED ── */
+    .em-tile.greyed{opacity:0.35;}
+    .em-tile.greyed .em-tile-name,.em-tile.greyed .em-tile-num{color:var(--text-muted);}
   </style>
 </head>
 <body>
@@ -364,29 +383,11 @@
   </div>
 </div>
 
-<!-- ASSET MODAL (new trade) -->
-<div id="asset-modal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-  <div class="modal-box">
-    <div class="modal-inner">
-      <div class="modal-title">New Trade</div>
-      <div class="form-group">
-        <label class="form-label">Asset</label>
-        <select class="form-select" id="asset-select">
-          <option value="NAS100">🇺🇸 NAS100</option>
-          <option value="S&P500">🇺🇸 S&amp;P500</option>
-          <option value="US30">🇺🇸 US30</option>
-          <option value="DAX40">🇩🇪 DAX40</option>
-          <option value="FTSE100">🇬🇧 FTSE100</option>
-          <option value="XAUUSD">🥇 XAUUSD</option>
-          <option value="USOUSD">🛢️ USOUSD</option>
-          <option value="EURUSD">🇪🇺 EURUSD</option>
-        </select>
-      </div>
-      <div class="modal-actions">
-        <button id="asset-modal-cancel" class="btn btn-ghost">Cancel</button>
-        <button id="asset-modal-ok" class="btn btn-primary">Open Trade</button>
-      </div>
-    </div>
+<!-- ASSET PICKER DRAWER -->
+<div id="asset-picker" style="position:fixed;inset:0;z-index:200;display:none;align-items:flex-end;background:var(--overlay);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);">
+  <div id="asset-picker-sheet" style="width:100%;max-width:480px;margin:0 auto;background:var(--bg-2);border-radius:22px 22px 0 0;border-top:1px solid var(--border-strong);padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));animation:drawerUp 280ms cubic-bezier(.4,0,.2,1);">
+    <div style="width:36px;height:4px;background:var(--bg-4);border-radius:4px;margin:12px auto 0;"></div>
+    <div id="asset-picker-inner" style="padding:14px 14px 0;max-height:75vh;overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -674,14 +675,17 @@ const ChecklistPage={
       });
     });
 
-    // EM tiles
+    // EM tiles — radio selection with greying of others
     el.querySelectorAll(".em-tile[data-emid]").forEach(tile=>{
       tile.addEventListener("click",()=>{
         const eid=tile.dataset.emid;
-        // Radio — only one can be selected
+        // Toggle off if already selected, otherwise select this one
         active.entryModel=active.entryModel===eid?null:eid;
         el.querySelectorAll(".em-tile").forEach(t=>{
-          t.classList.toggle("checked",t.dataset.emid===active.entryModel);
+          const isSelected=t.dataset.emid===active.entryModel;
+          const isGreyed=active.entryModel&&!isSelected;
+          t.classList.toggle("checked",isSelected);
+          t.classList.toggle("greyed",!!isGreyed);
         });
         DB.saveTrade(active);
       });
@@ -710,12 +714,15 @@ const ChecklistPage={
 
         <div class="cl-section-label" style="margin-top:18px;">Entry Model</div>
         <div class="em-grid">
-          ${EM_ITEMS.map(e=>`
-            <div class="em-tile ${em===e.id?"checked":""}" data-emid="${e.id}">
+          ${EM_ITEMS.map(e=>{
+            const isChecked=em===e.id;
+            const isGreyed=em&&em!==e.id;
+            return`<div class="em-tile ${isChecked?"checked":""} ${isGreyed?"greyed":""}" data-emid="${e.id}">
               <div class="em-check-dot"><svg width="8" height="8" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="#000" stroke-width="3" stroke-linecap="round"/></svg></div>
               <div class="em-tile-num">${e.num}</div>
               <div class="em-tile-name">${e.name}</div>
-            </div>`).join("")}
+            </div>`;
+          }).join("")}
         </div>
 
         <div class="cl-action-row">
@@ -727,21 +734,125 @@ const ChecklistPage={
       </div>`;
   },
 
+  _getMUTMinutes(){
+    // Returns current time as minutes since midnight in Mauritius Time (UTC+4)
+    const now=new Date();
+    const mutOffset=4*60; // UTC+4
+    const utcMinutes=now.getUTCHours()*60+now.getUTCMinutes();
+    return(utcMinutes+mutOffset)%(24*60);
+  },
+
+  _getAvailableAssets(){
+    const m=this._getMUTMinutes();
+    const t=(h,min=0)=>h*60+min;
+    const sessions=[];
+
+    // London session: 11:00–19:00 MUT → DAX40, FTSE100, XAUUSD
+    if(m>=t(11)&&m<t(19)){
+      sessions.push({
+        label:"London Session",color:"#5c9eff",dotColor:"#2979ff",tag:"tag-london",tagText:"London",
+        assets:[
+          {value:"DAX40",  flag:"🇩🇪",desc:"German Index"},
+          {value:"FTSE100",flag:"🇬🇧",desc:"UK Index"},
+          {value:"XAUUSD", flag:"🥇",desc:"Gold / USD"},
+        ]
+      });
+    }
+
+    // NY Forex: 16:00–19:00 MUT → EURUSD (overlaps with London close)
+    if(m>=t(16)&&m<t(19)){
+      // EURUSD added to London session block if London is already listed
+      const londonSess=sessions.find(s=>s.label==="London Session");
+      if(londonSess){
+        if(!londonSess.assets.find(a=>a.value==="EURUSD")){
+          londonSess.assets.push({value:"EURUSD",flag:"🇪🇺",desc:"Euro / US Dollar"});
+        }
+      } else {
+        sessions.push({
+          label:"NY Forex Session",color:"#ffa502",dotColor:"#ffa502",tag:"tag-ny-forex",tagText:"NY Forex",
+          assets:[
+            {value:"EURUSD",flag:"🇪🇺",desc:"Euro / US Dollar"},
+          ]
+        });
+      }
+    }
+
+    // NY Stocks: 17:30–00:30 MUT (crosses midnight → handle wrap)
+    const nyStockStart=t(17,30);
+    const nyStockEnd=t(0,30); // next day 00:30
+    const inNYStock=(nyStockStart<=nyStockEnd)
+      ?(m>=nyStockStart&&m<nyStockEnd)
+      :(m>=nyStockStart||m<nyStockEnd);
+    if(inNYStock){
+      sessions.push({
+        label:"NY Stock Session",color:"#00e676",dotColor:"#00e676",tag:"tag-ny-stock",tagText:"NY Stocks",
+        assets:[
+          {value:"NAS100", flag:"🇺🇸",desc:"Nasdaq 100"},
+          {value:"S&P500", flag:"🇺🇸",desc:"S&P 500"},
+          {value:"US30",   flag:"🇺🇸",desc:"Dow Jones"},
+          {value:"XAUUSD", flag:"🥇",desc:"Gold / USD"},
+          {value:"USOUSD", flag:"🛢️",desc:"Crude Oil / USD"},
+          {value:"EURUSD", flag:"🇪🇺",desc:"Euro / US Dollar"},
+        ]
+      });
+    }
+
+    return sessions;
+  },
+
   promptNewTrade(){
-    document.getElementById("asset-modal").classList.remove("hidden");
-    const ok=document.getElementById("asset-modal-ok");
-    const cancel=document.getElementById("asset-modal-cancel");
-    const newOk=ok.cloneNode(true);const newCancel=cancel.cloneNode(true);
-    ok.parentNode.replaceChild(newOk,ok);cancel.parentNode.replaceChild(newCancel,cancel);
-    newCancel.addEventListener("click",()=>document.getElementById("asset-modal").classList.add("hidden"));
-    newOk.addEventListener("click",async()=>{
-      const pair=document.getElementById("asset-select").value;
-      document.getElementById("asset-modal").classList.add("hidden");
-      const trade={id:crypto.randomUUID(),pair,poi:{},entryModel:null,status:"open",createdAt:Date.now(),updatedAt:Date.now()};
-      await DB.saveTrade(trade);
-      this._trades.push(trade);
-      this._activeId=trade.id;
-      this.render();
+    const picker=document.getElementById("asset-picker");
+    const inner=document.getElementById("asset-picker-inner");
+    const sessions=this._getAvailableAssets();
+
+    if(!sessions.length){
+      inner.innerHTML=`<div class="no-session-msg">
+        <div style="font-size:32px;margin-bottom:12px;">🕐</div>
+        <strong style="color:var(--text-primary);display:block;margin-bottom:6px;">No Active Session</strong>
+        Markets are currently closed. Check back during:<br>
+        <span style="color:#5c9eff;">London 11:00–19:00</span> · 
+        <span style="color:var(--accent);">NY Stocks 17:30–00:30</span> · 
+        <span style="color:var(--warning);">NY Forex 16:00–19:00</span>
+        <div style="margin-top:16px;"><button id="picker-close-btn" class="btn btn-ghost btn-full">Close</button></div>
+      </div>`;
+    } else {
+      // Deduplicate assets that may appear in multiple sessions
+      let html="";
+      const seen=new Set();
+      sessions.forEach(sess=>{
+        html+=`<div class="asset-section-label"><span class="asset-section-dot" style="background:${sess.dotColor};"></span>${sess.label}</div>`;
+        sess.assets.forEach(a=>{
+          const key=`${sess.label}-${a.value}`;
+          if(seen.has(key))return;
+          seen.add(key);
+          html+=`<div class="asset-row" data-asset="${a.value}">
+            <div class="asset-flag">${a.flag}</div>
+            <div><div class="asset-name">${a.value}</div><div class="asset-desc">${a.desc}</div></div>
+            <span class="asset-session-tag ${sess.tag}">${sess.tagText}</span>
+          </div>`;
+        });
+      });
+      inner.innerHTML=html;
+    }
+
+    picker.style.display="flex";
+
+    // Click outside sheet to close
+    picker.addEventListener("click",function onBg(e){
+      if(e.target===picker){picker.style.display="none";picker.removeEventListener("click",onBg);}
+    });
+    inner.querySelector("#picker-close-btn")?.addEventListener("click",()=>{picker.style.display="none";});
+
+    inner.querySelectorAll(".asset-row[data-asset]").forEach(row=>{
+      row.addEventListener("click",async()=>{
+        picker.style.display="none";
+        const pair=row.dataset.asset;
+        const trade={id:crypto.randomUUID(),pair,poi:{},entryModel:null,status:"open",createdAt:Date.now(),updatedAt:Date.now()};
+        await DB.saveTrade(trade);
+        this._trades.push(trade);
+        this._activeId=trade.id;
+        this.render();
+      });
     });
   },
 
