@@ -337,8 +337,38 @@
     .no-session-msg{text-align:center;padding:28px 16px 20px;color:var(--text-muted);font-size:14px;line-height:1.6;}
 
     /* ── ENTRY MODEL GREYED ── */
-    .em-tile.greyed{opacity:0.35;}
-    .em-tile.greyed .em-tile-name,.em-tile.greyed .em-tile-num{color:var(--text-muted);}
+    .em-tile.greyed{opacity:0.6;}
+    .em-tile.greyed .em-tile-name{color:var(--text-secondary);}
+    .em-tile.greyed .em-tile-num{color:var(--text-muted);}
+
+    /* ── TREND-COLOURED CHECKED STATES ── */
+    /* Uptrend = green */
+    .trend-up .poi-tile.checked{background:rgba(0,230,118,.12);border-color:rgba(0,230,118,.45);}
+    .trend-up .poi-tile.checked .poi-tile-name{color:var(--accent);}
+    .trend-up .poi-tile.checked .poi-check-dot{background:var(--accent);}
+    .trend-up .em-tile.checked{background:rgba(0,230,118,.12);border-color:rgba(0,230,118,.45);}
+    .trend-up .em-tile.checked .em-tile-name{color:var(--accent);}
+    .trend-up .em-tile.checked .em-tile-num{color:rgba(0,230,118,.7);}
+    .trend-up .em-tile.checked .em-check-dot{background:var(--accent);}
+    /* Downtrend = red */
+    .trend-down .poi-tile.checked{background:rgba(255,71,87,.10);border-color:rgba(255,71,87,.45);}
+    .trend-down .poi-tile.checked .poi-tile-name{color:var(--danger);}
+    .trend-down .poi-tile.checked .poi-check-dot{background:var(--danger);}
+    .trend-down .em-tile.checked{background:rgba(255,71,87,.10);border-color:rgba(255,71,87,.45);}
+    .trend-down .em-tile.checked .em-tile-name{color:var(--danger);}
+    .trend-down .em-tile.checked .em-tile-num{color:rgba(255,71,87,.7);}
+    .trend-down .em-tile.checked .em-check-dot{background:var(--danger);}
+    /* Trend badge on tab */
+    .trend-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;margin-left:2px;flex-shrink:0;}
+    .trend-badge.up{background:rgba(0,230,118,.15);color:var(--accent);}
+    .trend-badge.down{background:rgba(255,71,87,.12);color:var(--danger);}
+    .trend-badge.cons{background:rgba(255,165,2,.12);color:var(--warning);}
+    /* Trend selector buttons */
+    .trend-btn-row{display:flex;gap:8px;margin-top:10px;}
+    .trend-btn{flex:1;padding:10px 8px;border-radius:10px;border:2px solid var(--border);background:var(--bg-3);font-size:12px;font-weight:700;cursor:pointer;transition:all var(--t-fast);display:flex;align-items:center;justify-content:center;gap:6px;color:var(--text-secondary);}
+    .trend-btn.selected-up{border-color:var(--accent);background:rgba(0,230,118,.12);color:var(--accent);}
+    .trend-btn.selected-down{border-color:var(--danger);background:rgba(255,71,87,.1);color:var(--danger);}
+    .trend-btn.selected-cons{border-color:var(--warning);background:rgba(255,165,2,.1);color:var(--warning);}
   </style>
 </head>
 <body>
@@ -632,11 +662,16 @@ const ChecklistPage={
     }
 
     // Build tab bar
-    const tabsHtml=this._trades.map(t=>`
-      <div class="cl-tab ${t.id===this._activeId?"active":""}" data-tid="${t.id}">
-        ${t.pair}
+    const trendColor=(trend)=>trend==="up"?"var(--accent)":trend==="down"?"var(--danger)":trend==="consolidation"?"var(--warning)":"var(--text-muted)";
+    const tabsHtml=this._trades.map(t=>{
+      const tc=trendColor(t.trend);
+      const trendBadge=t.trend==="up"?`<span class="trend-badge up">▲</span>`:t.trend==="down"?`<span class="trend-badge down">▼</span>`:t.trend==="consolidation"?`<span class="trend-badge cons">⇔</span>`:"";
+      const isActive=t.id===this._activeId;
+      return`<div class="cl-tab ${isActive?"active":""}" data-tid="${t.id}" style="color:${tc}${isActive?"":";opacity:0.7"}">
+        ${t.pair}${trendBadge}
         <button class="cl-tab-close" data-close-tid="${t.id}" title="Close trade">✕</button>
-      </div>`).join("")+`<button class="cl-tab-add" id="cl-add-btn" title="New trade">+</button>`;
+      </div>`;
+    }).join("")+`<button class="cl-tab-add" id="cl-add-btn" title="New trade">+</button>`;
 
     const active=this._trades.find(t=>t.id===this._activeId)||this._trades[0];
 
@@ -700,9 +735,20 @@ const ChecklistPage={
   _renderTradeBody(trade){
     const poi=trade.poi||{};
     const em=trade.entryModel;
+    const trendClass=trade.trend==="up"?"trend-up":trade.trend==="down"?"trend-down":"";
+    const trendLabel=trade.trend==="up"
+      ?`<span style="color:var(--accent);font-weight:700;">▲ Uptrend</span>`
+      :trade.trend==="down"
+      ?`<span style="color:var(--danger);font-weight:700;">▼ Downtrend</span>`
+      :trade.trend==="consolidation"
+      ?`<span style="color:var(--warning);font-weight:700;">⇔ Consolidation</span>`
+      :`<span style="color:var(--text-muted);">— No trend set</span>`;
     return`
-      <div class="cl-content">
-        <div class="cl-section-label">POI — Price Reacted To</div>
+      <div class="cl-content ${trendClass}">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+          <div class="cl-section-label" style="margin:0;">POI — Price Reacted To</div>
+          <div style="font-size:11px;">${trendLabel}</div>
+        </div>
         <div class="poi-grid">
           ${POI_ITEMS.map(p=>`
             <div class="poi-tile ${poi[p.id]?"checked":""}" data-pid="${p.id}">
@@ -735,11 +781,23 @@ const ChecklistPage={
   },
 
   _getMUTMinutes(){
-    // Returns current time as minutes since midnight in Mauritius Time (UTC+4)
     const now=new Date();
-    const mutOffset=4*60; // UTC+4
+    const mutOffset=4*60;
     const utcMinutes=now.getUTCHours()*60+now.getUTCMinutes();
     return(utcMinutes+mutOffset)%(24*60);
+  },
+
+  _getMUTDay(){
+    // Returns day-of-week in MUT (0=Sun,1=Mon,...,6=Sat)
+    const now=new Date();
+    // UTC time + 4h offset
+    const mutMs=now.getTime()+(4*60*60*1000);
+    return new Date(mutMs).getUTCDay();
+  },
+
+  _isWeekend(){
+    const d=this._getMUTDay();
+    return d===0||d===6; // Sunday or Saturday
   },
 
   _getAvailableAssets(){
@@ -806,13 +864,17 @@ const ChecklistPage={
     const sessions=this._getAvailableAssets();
 
     if(!sessions.length){
+      const isWknd=this._isWeekend();
+      const dayName=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][this._getMUTDay()];
       inner.innerHTML=`<div class="no-session-msg">
-        <div style="font-size:32px;margin-bottom:12px;">🕐</div>
-        <strong style="color:var(--text-primary);display:block;margin-bottom:6px;">No Active Session</strong>
-        Markets are currently closed. Check back during:<br>
-        <span style="color:#5c9eff;">London 11:00–19:00</span> · 
+        <div style="font-size:32px;margin-bottom:12px;">${isWknd?"🏖️":"🕐"}</div>
+        <strong style="color:var(--text-primary);display:block;margin-bottom:6px;">${isWknd?"Markets Closed — "+dayName:"No Active Session"}</strong>
+        ${isWknd
+          ?"Financial markets are closed on weekends. Trading resumes Monday from 11:00 MUT."
+          :"Markets are currently closed. Check back during:"}<br>
+        ${!isWknd?`<span style="color:#5c9eff;">London 11:00–19:00</span> · 
         <span style="color:var(--accent);">NY Stocks 17:30–00:30</span> · 
-        <span style="color:var(--warning);">NY Forex 16:00–19:00</span>
+        <span style="color:var(--warning);">NY Forex 16:00–19:00</span>`:""}
         <div style="margin-top:16px;"><button id="picker-close-btn" class="btn btn-ghost btn-full">Close</button></div>
       </div>`;
     } else {
@@ -825,10 +887,11 @@ const ChecklistPage={
           const key=`${sess.label}-${a.value}`;
           if(seen.has(key))return;
           seen.add(key);
-          html+=`<div class="asset-row" data-asset="${a.value}">
+          const alreadyOpen=this._trades.some(t=>t.pair===a.value);
+          html+=`<div class="asset-row${alreadyOpen?" asset-row-disabled":""}" ${alreadyOpen?"":`data-asset="${a.value}"`} style="${alreadyOpen?"opacity:0.4;cursor:not-allowed;":""}">
             <div class="asset-flag">${a.flag}</div>
-            <div><div class="asset-name">${a.value}</div><div class="asset-desc">${a.desc}</div></div>
-            <span class="asset-session-tag ${sess.tag}">${sess.tagText}</span>
+            <div><div class="asset-name">${a.value}</div><div class="asset-desc">${alreadyOpen?"Already open":a.desc}</div></div>
+            <span class="asset-session-tag ${sess.tag}">${alreadyOpen?"Open":sess.tagText}</span>
           </div>`;
         });
       });
@@ -844,14 +907,53 @@ const ChecklistPage={
     inner.querySelector("#picker-close-btn")?.addEventListener("click",()=>{picker.style.display="none";});
 
     inner.querySelectorAll(".asset-row[data-asset]").forEach(row=>{
-      row.addEventListener("click",async()=>{
-        picker.style.display="none";
+      row.addEventListener("click",()=>{
         const pair=row.dataset.asset;
-        const trade={id:crypto.randomUUID(),pair,poi:{},entryModel:null,status:"open",createdAt:Date.now(),updatedAt:Date.now()};
-        await DB.saveTrade(trade);
-        this._trades.push(trade);
-        this._activeId=trade.id;
-        this.render();
+        // Show trend picker inside the same drawer
+        inner.innerHTML=`
+          <div style="padding-bottom:8px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:10px;">
+              ${pair} — What is the current trend?
+            </div>
+            <div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.5;">
+              Select the market direction based on your 4H analysis.
+            </div>
+            <div class="trend-btn-row">
+              <button class="trend-btn" id="trend-up-btn" style="border-color:rgba(0,230,118,.4);background:rgba(0,230,118,.08);color:var(--accent);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polyline points="18 15 12 9 6 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Uptrend
+              </button>
+              <button class="trend-btn" id="trend-down-btn" style="border-color:rgba(255,71,87,.4);background:rgba(255,71,87,.08);color:var(--danger);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><polyline points="6 9 12 15 18 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Downtrend
+              </button>
+            </div>
+            <div style="margin-top:8px;">
+              <button class="trend-btn" id="trend-cons-btn" style="width:100%;border-color:rgba(255,165,2,.4);background:rgba(255,165,2,.08);color:var(--warning);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+                Consolidation
+              </button>
+            </div>
+          </div>`;
+        const createTrade=async(trend)=>{
+          picker.style.display="none";
+          // If a tab for this asset is already open, switch to it instead
+          const existing=this._trades.find(t=>t.pair===pair);
+          if(existing){
+            this._activeId=existing.id;
+            this.render();
+            toast(`${pair} is already open — switched to existing tab`,"info");
+            return;
+          }
+          const trade={id:crypto.randomUUID(),pair,trend,poi:{},entryModel:null,status:"open",createdAt:Date.now(),updatedAt:Date.now()};
+          await DB.saveTrade(trade);
+          this._trades.push(trade);
+          this._activeId=trade.id;
+          this.render();
+        };
+        inner.querySelector("#trend-up-btn").addEventListener("click",()=>createTrade("up"));
+        inner.querySelector("#trend-down-btn").addEventListener("click",()=>createTrade("down"));
+        inner.querySelector("#trend-cons-btn").addEventListener("click",()=>createTrade("consolidation"));
       });
     });
   },
@@ -877,6 +979,7 @@ const ChecklistPage={
       trade.status=isProfit?"profit":"loss";
       trade.amount=amt;
       trade.closedAt=Date.now();
+      // trend is already part of trade object, preserved here
       await DB.saveTrade(trade);
       this._trades=this._trades.filter(t=>t.id!==trade.id);
       this._activeId=this._trades.length?this._trades[this._trades.length-1].id:null;
@@ -976,9 +1079,50 @@ const AnalyticsPage={
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:10px;">Entry Model Performance</div>
         <div style="display:flex;flex-direction:column;gap:8px;">${emRowsHtml}</div>
       </div>
+      <div style="margin:0 16px 16px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:10px;">Market Trend Analysis</div>
+        ${this._buildTrendSection(closed)}
+      </div>
       <div style="height:80px;"></div>`;
 
     this._bindCalNav(el,closed);
+  },
+
+  _buildTrendSection(closed){
+    const up=closed.filter(t=>t.trend==="up");
+    const down=closed.filter(t=>t.trend==="down");
+    const cons=closed.filter(t=>t.trend==="consolidation");
+    const statBlock=(label,trades,color)=>{
+      const w=trades.filter(t=>t.status==="profit").length;
+      const l=trades.filter(t=>t.status==="loss").length;
+      const tot=w+l;
+      const wr=tot>0?Math.round((w/tot)*100):0;
+      const totalPnl=trades.filter(t=>t.status==="profit").reduce((s,t)=>s+parseFloat(t.amount||0),0)
+                    -trades.filter(t=>t.status==="loss").reduce((s,t)=>s+parseFloat(t.amount||0),0);
+      const barColor=wr>=60?"var(--accent)":wr>=40?"var(--warning)":"var(--danger)";
+      return`<div style="background:var(--bg-3);border-radius:12px;padding:14px;border:1px solid var(--border);">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;gap:7px;">
+            <span style="font-size:16px;">${label==="Uptrend"?"📈":label==="Downtrend"?"📉":"⇔"}</span>
+            <span style="font-size:13px;font-weight:700;color:${color};">${label}</span>
+          </div>
+          <span style="font-family:var(--font-mono);font-size:12px;font-weight:700;color:${totalPnl>=0?"var(--accent)":"var(--danger)"};">${totalPnl>=0?"+$":"−$"}${Math.abs(totalPnl).toFixed(2)}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:${tot>0?"10px":"0"};">
+          <div style="text-align:center;"><span style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--text-primary);display:block;">${tot}</span><span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;">Trades</span></div>
+          <div style="text-align:center;"><span style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--accent);display:block;">${w}</span><span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;">Wins</span></div>
+          <div style="text-align:center;"><span style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--danger);display:block;">${l}</span><span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;">Losses</span></div>
+          <div style="text-align:center;"><span style="font-family:var(--font-mono);font-size:16px;font-weight:700;color:${barColor};display:block;">${tot>0?wr+"%":"—"}</span><span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;">Win %</span></div>
+        </div>
+        ${tot>0?`<div style="height:5px;background:var(--bg-4);border-radius:5px;overflow:hidden;"><div style="height:100%;width:${wr}%;background:${barColor};border-radius:5px;transition:width .6s ease;"></div></div>`:""}
+      </div>`;
+    };
+    return`<div style="display:flex;flex-direction:column;gap:10px;">
+      ${statBlock("Uptrend",up,"var(--accent)")}
+      ${statBlock("Downtrend",down,"var(--danger)")}
+      ${statBlock("Consolidation",cons,"var(--warning)")}
+      ${!closed.length?`<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px;">No closed trades yet.</div>`:""}
+    </div>`;
   },
 
   _buildCalendar(closed){
@@ -1164,7 +1308,9 @@ const Fab={
     page.querySelector("#eco-back").addEventListener("click",()=>{page.classList.add("eco-cal-exit");setTimeout(()=>page.remove(),280);});
   },
   showLotTable(){
-    document.getElementById("lot-table-page-el")?.remove();
+    // Reuse the asset-picker drawer for the lot table
+    const picker=document.getElementById("asset-picker");
+    const inner=document.getElementById("asset-picker-inner");
     const instruments=[
       {name:"NAS100",flag:"🇺🇸",desc:"$1 per point / lot",tickVal:1,targets:[500,800,1000,1200],color:"#2979ff"},
       {name:"S&P500",flag:"🇺🇸",desc:"$1 per point / lot",tickVal:1,targets:[85,135,170,200],color:"#00e676"},
@@ -1176,26 +1322,27 @@ const Fab={
       {name:"EURUSD",flag:"🇪🇺",desc:"$10 per pip / lot",tickVal:10,targets:[10,20,50,100],color:"#60a5fa"},
     ];
     const lots=[0.1,0.5,1.0,2.0,3.0];
-    const page=document.createElement("div");page.id="lot-table-page-el";page.className="strategy-slide-page";
     const tabsHtml=instruments.map((ins,i)=>`<button class="lot-tab ${i===0?"active":""}" data-ins="${i}" style="font-size:10px;">${ins.flag} ${ins.name}</button>`).join("");
-    const tablesHtml=instruments.map((ins,i)=>`<div class="lot-table-wrap ${i===0?"":"hidden"}" data-ins-panel="${i}"><div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;text-align:center;">${ins.desc}</div><div style="overflow-x:auto;"><table class="lot-tbl"><thead><tr><th>Ticks</th>${lots.map(l=>`<th>${l} lot</th>`).join("")}</tr></thead><tbody>${ins.targets.map(t=>`<tr><td style="font-weight:700;color:${ins.color};">${t}</td>${lots.map(l=>`<td>$${(t*ins.tickVal*l).toFixed(2)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`).join("");
-    page.innerHTML=`
-      <div class="strategy-slide-topbar">
-        <button class="strategy-slide-back" id="lot-back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <span class="eco-cal-title">📊 Lot Size Table</span>
+    const tablesHtml=instruments.map((ins,i)=>`<div class="lot-table-wrap ${i===0?"":"hidden"}" data-ins-panel="${i}" style="padding-bottom:4px;"><div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;text-align:center;">${ins.desc}</div><div style="overflow-x:auto;"><table class="lot-tbl"><thead><tr><th>Ticks</th>${lots.map(l=>`<th>${l} lot</th>`).join("")}</tr></thead><tbody>${ins.targets.map(t=>`<tr><td style="font-weight:700;color:${ins.color};">${t}</td>${lots.map(l=>`<td>$${(t*ins.tickVal*l).toFixed(2)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`).join("");
+    inner.innerHTML=`
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-size:15px;font-weight:700;color:var(--text-primary);">📊 Lot Size Table</span>
+        <button id="lot-drawer-close" style="width:28px;height:28px;border-radius:50%;background:var(--bg-4);border:none;color:var(--text-muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
       </div>
-      <div class="strategy-slide-body" style="padding:16px;">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--bg-3);border-radius:10px;padding:4px;margin-bottom:14px;">${tabsHtml}</div>
-        ${tablesHtml}
-      </div>`;
-    document.body.appendChild(page);
-    page.querySelector("#lot-back").addEventListener("click",()=>{page.classList.add("slide-exit");setTimeout(()=>page.remove(),280);});
-    page.querySelectorAll(".lot-tab").forEach(btn=>{
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--bg-4);border-radius:10px;padding:4px;margin-bottom:12px;">${tabsHtml}</div>
+      ${tablesHtml}`;
+    picker.style.display="flex";
+    // Close on overlay tap
+    picker.addEventListener("click",function onBg(e){
+      if(e.target===picker){picker.style.display="none";picker.removeEventListener("click",onBg);}
+    });
+    inner.querySelector("#lot-drawer-close").addEventListener("click",()=>{picker.style.display="none";});
+    inner.querySelectorAll(".lot-tab").forEach(btn=>{
       btn.addEventListener("click",()=>{
-        page.querySelectorAll(".lot-tab").forEach(b=>b.classList.remove("active"));
-        page.querySelectorAll("[data-ins-panel]").forEach(p=>p.classList.add("hidden"));
+        inner.querySelectorAll(".lot-tab").forEach(b=>b.classList.remove("active"));
+        inner.querySelectorAll("[data-ins-panel]").forEach(p=>p.classList.add("hidden"));
         btn.classList.add("active");
-        page.querySelector(`[data-ins-panel="${btn.dataset.ins}"]`)?.classList.remove("hidden");
+        inner.querySelector(`[data-ins-panel="${btn.dataset.ins}"]`)?.classList.remove("hidden");
       });
     });
   },
