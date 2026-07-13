@@ -805,7 +805,7 @@ const ChecklistPage={
     const t=(h,min=0)=>h*60+min;
     const sessions=[];
 
-    // London session: 11:00–19:00 MUT → DAX40, FTSE100, XAUUSD
+    // London session: 11:00–19:00 MUT → DAX40, FTSE100, XAUUSD, EURUSD
     if(m>=t(11)&&m<t(19)){
       sessions.push({
         label:"London Session",color:"#5c9eff",dotColor:"#2979ff",tag:"tag-london",tagText:"London",
@@ -813,34 +813,31 @@ const ChecklistPage={
           {value:"DAX40",  flag:"🇩🇪",desc:"German Index"},
           {value:"FTSE100",flag:"🇬🇧",desc:"UK Index"},
           {value:"XAUUSD", flag:"🥇",desc:"Gold / USD"},
+          {value:"EURUSD", flag:"🇪🇺",desc:"Euro / US Dollar"},
         ]
       });
     }
 
-    // NY Forex: 16:00–19:00 MUT → EURUSD (overlaps with London close)
-    if(m>=t(16)&&m<t(19)){
-      // EURUSD added to London session block if London is already listed
-      const londonSess=sessions.find(s=>s.label==="London Session");
-      if(londonSess){
-        if(!londonSess.assets.find(a=>a.value==="EURUSD")){
-          londonSess.assets.push({value:"EURUSD",flag:"🇪🇺",desc:"Euro / US Dollar"});
-        }
-      } else {
-        sessions.push({
-          label:"NY Forex Session",color:"#ffa502",dotColor:"#ffa502",tag:"tag-ny-forex",tagText:"NY Forex",
-          assets:[
-            {value:"EURUSD",flag:"🇪🇺",desc:"Euro / US Dollar"},
-          ]
-        });
-      }
+    // NY Session: 16:00–01:00 MUT → XAUUSD, USOUSD, EURUSD
+    const nyForexStart=t(16);
+    const nyForexEnd=t(1,0);
+    const inNYForex=(m>=nyForexStart||m<nyForexEnd);
+    if(inNYForex&&!(m>=t(11)&&m<t(19))){
+      // Only show as separate block outside London hours
+      sessions.push({
+        label:"NY Session",color:"#ffa502",dotColor:"#ffa502",tag:"tag-ny-forex",tagText:"NY Session",
+        assets:[
+          {value:"XAUUSD", flag:"🥇",desc:"Gold / USD"},
+          {value:"USOUSD", flag:"🛢️",desc:"Crude Oil / USD"},
+          {value:"EURUSD", flag:"🇪🇺",desc:"Euro / US Dollar"},
+        ]
+      });
     }
 
-    // NY Stocks: 17:30–00:30 MUT (crosses midnight → handle wrap)
+    // NY Stock Session: 17:30–00:30 MUT → NAS100, S&P500, US30 only
     const nyStockStart=t(17,30);
-    const nyStockEnd=t(0,30); // next day 00:30
-    const inNYStock=(nyStockStart<=nyStockEnd)
-      ?(m>=nyStockStart&&m<nyStockEnd)
-      :(m>=nyStockStart||m<nyStockEnd);
+    const nyStockEnd=t(0,30);
+    const inNYStock=(m>=nyStockStart||m<nyStockEnd);
     if(inNYStock){
       sessions.push({
         label:"NY Stock Session",color:"#00e676",dotColor:"#00e676",tag:"tag-ny-stock",tagText:"NY Stocks",
@@ -848,9 +845,6 @@ const ChecklistPage={
           {value:"NAS100", flag:"🇺🇸",desc:"Nasdaq 100"},
           {value:"S&P500", flag:"🇺🇸",desc:"S&P 500"},
           {value:"US30",   flag:"🇺🇸",desc:"Dow Jones"},
-          {value:"XAUUSD", flag:"🥇",desc:"Gold / USD"},
-          {value:"USOUSD", flag:"🛢️",desc:"Crude Oil / USD"},
-          {value:"EURUSD", flag:"🇪🇺",desc:"Euro / US Dollar"},
         ]
       });
     }
@@ -874,7 +868,7 @@ const ChecklistPage={
           :"Markets are currently closed. Check back during:"}<br>
         ${!isWknd?`<span style="color:#5c9eff;">London 11:00–19:00</span> · 
         <span style="color:var(--accent);">NY Stocks 17:30–00:30</span> · 
-        <span style="color:var(--warning);">NY Forex 16:00–19:00</span>`:""}
+        <span style="color:var(--warning);">NY Session 16:00–01:00</span>`:""}
         <div style="margin-top:16px;"><button id="picker-close-btn" class="btn btn-ghost btn-full">Close</button></div>
       </div>`;
     } else {
@@ -1308,41 +1302,110 @@ const Fab={
     page.querySelector("#eco-back").addEventListener("click",()=>{page.classList.add("eco-cal-exit");setTimeout(()=>page.remove(),280);});
   },
   showLotTable(){
-    // Reuse the asset-picker drawer for the lot table
     const picker=document.getElementById("asset-picker");
     const inner=document.getElementById("asset-picker-inner");
     const instruments=[
-      {name:"NAS100",flag:"🇺🇸",desc:"$1 per point / lot",tickVal:1,targets:[500,800,1000,1200],color:"#2979ff"},
-      {name:"S&P500",flag:"🇺🇸",desc:"$1 per point / lot",tickVal:1,targets:[85,135,170,200],color:"#00e676"},
-      {name:"US30",flag:"🇺🇸",desc:"$1 per point / lot",tickVal:1,targets:[200,400,600,800],color:"#ffa502"},
-      {name:"DAX40",flag:"🇩🇪",desc:"€1 per point / lot",tickVal:1,targets:[200,320,400,480],color:"#ffd600"},
-      {name:"FTSE100",flag:"🇬🇧",desc:"£1 per point / lot",tickVal:1,targets:[150,240,300,360],color:"#ff4757"},
-      {name:"XAUUSD",flag:"🥇",desc:"$100 per $1 / lot",tickVal:100,targets:[1,2,5,10],color:"#f5c518"},
-      {name:"USOUSD",flag:"🛢️",desc:"$1000 per $1 / lot",tickVal:1000,targets:[0.5,1,2,3],color:"#8b5cf6"},
-      {name:"EURUSD",flag:"🇪🇺",desc:"$10 per pip / lot",tickVal:10,targets:[10,20,50,100],color:"#60a5fa"},
+      {name:"NAS100", flag:"🇺🇸",unit:"pts", tickVal:1,    targets:[200,300,500,700,800,1000,1200,1500],color:"#2979ff"},
+      {name:"S&P500", flag:"🇺🇸",unit:"pts", tickVal:1,    targets:[50,75,85,100,135,150,170,200],     color:"#00e676"},
+      {name:"US30",   flag:"🇺🇸",unit:"pts", tickVal:1,    targets:[100,150,200,300,400,500,600,800],  color:"#ffa502"},
+      {name:"DAX40",  flag:"🇩🇪",unit:"pts", tickVal:1,    targets:[100,150,200,250,320,400,480,600],  color:"#ffd600"},
+      {name:"FTSE100",flag:"🇬🇧",unit:"pts", tickVal:1,    targets:[80,100,150,200,240,300,360,500],   color:"#ff4757"},
+      {name:"XAUUSD", flag:"🥇", unit:"$mv", tickVal:100,  targets:[0.5,1,1.5,2,3,5,8,10],            color:"#f5c518"},
+      {name:"USOUSD", flag:"🛢️", unit:"$mv", tickVal:1000, targets:[0.25,0.5,0.75,1,1.5,2,3,5],       color:"#8b5cf6"},
+      {name:"EURUSD", flag:"🇪🇺",unit:"pips",tickVal:10,   targets:[5,8,10,15,20,30,50,100],           color:"#60a5fa"},
     ];
-    const lots=[0.1,0.5,1.0,2.0,3.0];
+
+    const buildRows=(ins,riskUSD)=>ins.targets.map(tgt=>{
+      const lotSize=riskUSD>0?(riskUSD/(tgt*ins.tickVal)).toFixed(2):"—";
+      const pnl=riskUSD>0?`$${riskUSD.toFixed(2)}`:"—";
+      return`<tr>
+        <td style="font-weight:700;color:${ins.color};">${tgt}</td>
+        <td style="color:var(--accent);font-weight:700;font-family:var(--font-mono);font-size:13px;">${lotSize}</td>
+        <td style="color:var(--text-secondary);">${pnl}</td>
+      </tr>`;
+    }).join("");
+
+    const buildTablesHtml=(riskUSD)=>instruments.map((ins,i)=>{
+      const descLabel=ins.unit==="pts"?"$1 per point per lot":ins.unit==="$mv"?`$${ins.tickVal} per $1 move per lot`:`$${ins.tickVal} per pip per lot`;
+      const unitLabel=ins.unit==="pts"?"Points":ins.unit==="$mv"?"$ Move":"Pips";
+      return`<div class="lot-table-wrap ${i===0?"":"hidden"}" data-ins-panel="${i}" style="padding-bottom:4px;">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;text-align:center;">${descLabel}</div>
+        ${riskUSD>0
+          ?`<div style="overflow-x:auto;"><table class="lot-tbl">
+              <thead><tr><th>${unitLabel}</th><th style="color:var(--accent);">Lot Size</th><th>P&amp;L at Risk</th></tr></thead>
+              <tbody>${buildRows(ins,riskUSD)}</tbody>
+            </table></div>`
+          :`<div style="text-align:center;padding:20px 0;color:var(--text-muted);font-size:13px;">Enter a risk amount above to see lot sizes.</div>`}
+      </div>`;
+    }).join("");
+
+    // Update only the tables section without touching the input
+    const updateTables=(riskUSD)=>{
+      const tablesWrap=inner.querySelector("#lot-tables-wrap");
+      if(tablesWrap)tablesWrap.innerHTML=buildTablesHtml(riskUSD);
+      // Update hint text and border
+      const hint=inner.querySelector("#risk-hint");
+      const inp=inner.querySelector("#risk-input");
+      const clearBtn=inner.querySelector("#risk-clear-btn");
+      if(hint)hint.textContent=riskUSD>0?`Lot size to risk exactly $${riskUSD} per trade`:"Enter your risk amount to calculate the required lot size for each stop loss distance.";
+      if(hint)hint.style.color=riskUSD>0?"var(--accent)":"var(--text-muted)";
+      if(inp)inp.style.borderColor=riskUSD>0?"var(--accent)":"var(--border)";
+      if(clearBtn)clearBtn.style.display=riskUSD>0?"block":"none";
+    };
+
     const tabsHtml=instruments.map((ins,i)=>`<button class="lot-tab ${i===0?"active":""}" data-ins="${i}" style="font-size:10px;">${ins.flag} ${ins.name}</button>`).join("");
-    const tablesHtml=instruments.map((ins,i)=>`<div class="lot-table-wrap ${i===0?"":"hidden"}" data-ins-panel="${i}" style="padding-bottom:4px;"><div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;text-align:center;">${ins.desc}</div><div style="overflow-x:auto;"><table class="lot-tbl"><thead><tr><th>Ticks</th>${lots.map(l=>`<th>${l} lot</th>`).join("")}</tr></thead><tbody>${ins.targets.map(t=>`<tr><td style="font-weight:700;color:${ins.color};">${t}</td>${lots.map(l=>`<td>$${(t*ins.tickVal*l).toFixed(2)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`).join("");
+
+    // Render the shell once — input is never destroyed
     inner.innerHTML=`
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <span style="font-size:15px;font-weight:700;color:var(--text-primary);">📊 Lot Size Table</span>
+        <span style="font-size:15px;font-weight:700;color:var(--text-primary);">📊 Lot Size Calculator</span>
         <button id="lot-drawer-close" style="width:28px;height:28px;border-radius:50%;background:var(--bg-4);border:none;color:var(--text-muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
       </div>
+      <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:7px;">How much do you want to risk?</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="position:relative;flex:1;">
+            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--accent);font-weight:700;font-size:15px;pointer-events:none;">$</span>
+            <input type="number" id="risk-input" placeholder="e.g. 100" min="0" step="1"
+              style="width:100%;background:var(--input-bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text-primary);padding:10px 12px 10px 26px;font-size:15px;font-family:var(--font-mono);outline:none;-moz-appearance:textfield;appearance:textfield;transition:border-color .2s;"/>
+          </div>
+          <button id="risk-clear-btn" style="display:none;padding:10px 14px;border-radius:8px;background:var(--bg-4);border:1px solid var(--border);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Clear</button>
+        </div>
+        <div id="risk-hint" style="font-size:11px;color:var(--text-muted);margin-top:7px;">Enter your risk amount to calculate the required lot size for each stop loss distance.</div>
+      </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--bg-4);border-radius:10px;padding:4px;margin-bottom:12px;">${tabsHtml}</div>
-      ${tablesHtml}`;
+      <div id="lot-tables-wrap">${buildTablesHtml(0)}</div>`;
+
     picker.style.display="flex";
-    // Close on overlay tap
+
     picker.addEventListener("click",function onBg(e){
       if(e.target===picker){picker.style.display="none";picker.removeEventListener("click",onBg);}
     });
     inner.querySelector("#lot-drawer-close").addEventListener("click",()=>{picker.style.display="none";});
-    inner.querySelectorAll(".lot-tab").forEach(btn=>{
+
+    const inp=inner.querySelector("#risk-input");
+    inner.querySelector("#risk-clear-btn").addEventListener("click",()=>{
+      inp.value="";
+      updateTables(0);
+    });
+
+    // Input: update tables only — never touch the input element itself
+    let debounce;
+    inp.addEventListener("input",e=>{
+      clearTimeout(debounce);
+      debounce=setTimeout(()=>{
+        const v=parseFloat(e.target.value);
+        updateTables(v>0?v:0);
+      },300);
+    });
+
+    // Instrument tabs
+    inner.querySelectorAll(".lot-tab").forEach((btn,i)=>{
       btn.addEventListener("click",()=>{
         inner.querySelectorAll(".lot-tab").forEach(b=>b.classList.remove("active"));
         inner.querySelectorAll("[data-ins-panel]").forEach(p=>p.classList.add("hidden"));
         btn.classList.add("active");
-        inner.querySelector(`[data-ins-panel="${btn.dataset.ins}"]`)?.classList.remove("hidden");
+        inner.querySelector(`[data-ins-panel="${i}"]`)?.classList.remove("hidden");
       });
     });
   },
