@@ -1355,57 +1355,65 @@ const Fab={
 
     const tabsHtml=instruments.map((ins,i)=>`<button class="lot-tab ${i===0?"active":""}" data-ins="${i}" style="font-size:10px;">${ins.flag} ${ins.name}</button>`).join("");
 
-    // Render the shell once — input is never destroyed
-    inner.innerHTML=`
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <span style="font-size:15px;font-weight:700;color:var(--text-primary);">📊 Lot Size Calculator</span>
-        <button id="lot-drawer-close" style="width:28px;height:28px;border-radius:50%;background:var(--bg-4);border:none;color:var(--text-muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-      </div>
-      <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:7px;">How much do you want to risk?</div>
-        <div style="display:flex;gap:8px;align-items:center;">
-          <div style="position:relative;flex:1;">
-            <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--accent);font-weight:700;font-size:15px;pointer-events:none;">$</span>
-            <input type="number" id="risk-input" placeholder="e.g. 100" min="0" step="1"
-              style="width:100%;background:var(--input-bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text-primary);padding:10px 12px 10px 26px;font-size:15px;font-family:var(--font-mono);outline:none;-moz-appearance:textfield;appearance:textfield;transition:border-color .2s;"/>
-          </div>
-          <button id="risk-clear-btn" style="display:none;padding:10px 14px;border-radius:8px;background:var(--bg-4);border:1px solid var(--border);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Clear</button>
+    // Load persisted risk amount, then render
+    DB.getSetting("lotRisk",0).then(savedRisk=>{
+      const initRisk=parseFloat(savedRisk)||0;
+
+      // Render the shell once — input is never destroyed
+      inner.innerHTML=`
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <span style="font-size:15px;font-weight:700;color:var(--text-primary);">📊 Lot Size Calculator</span>
+          <button id="lot-drawer-close" style="width:28px;height:28px;border-radius:50%;background:var(--bg-4);border:none;color:var(--text-muted);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
         </div>
-        <div id="risk-hint" style="font-size:11px;color:var(--text-muted);margin-top:7px;">Enter your risk amount to calculate the required lot size for each stop loss distance.</div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--bg-4);border-radius:10px;padding:4px;margin-bottom:12px;">${tabsHtml}</div>
-      <div id="lot-tables-wrap">${buildTablesHtml(0)}</div>`;
+        <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:12px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:7px;">How much do you want to risk?</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div style="position:relative;flex:1;">
+              <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--accent);font-weight:700;font-size:15px;pointer-events:none;">$</span>
+              <input type="number" id="risk-input" placeholder="e.g. 100" min="0" step="1" value="${initRisk||""}"
+                style="width:100%;background:var(--input-bg);border:1.5px solid ${initRisk>0?"var(--accent)":"var(--border)"};border-radius:8px;color:var(--text-primary);padding:10px 12px 10px 26px;font-size:15px;font-family:var(--font-mono);outline:none;-moz-appearance:textfield;appearance:textfield;transition:border-color .2s;"/>
+            </div>
+            <button id="risk-clear-btn" style="display:${initRisk>0?"block":"none"};padding:10px 14px;border-radius:8px;background:var(--bg-4);border:1px solid var(--border);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;">Clear</button>
+          </div>
+          <div id="risk-hint" style="font-size:11px;color:${initRisk>0?"var(--accent)":"var(--text-muted)"};margin-top:7px;">${initRisk>0?`Lot size to risk exactly $${initRisk} per trade`:"Enter your risk amount to calculate the required lot size for each stop loss distance."}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;background:var(--bg-4);border-radius:10px;padding:4px;margin-bottom:12px;">${tabsHtml}</div>
+        <div id="lot-tables-wrap">${buildTablesHtml(initRisk)}</div>`;
 
-    picker.style.display="flex";
+      picker.style.display="flex";
 
-    picker.addEventListener("click",function onBg(e){
-      if(e.target===picker){picker.style.display="none";picker.removeEventListener("click",onBg);}
-    });
-    inner.querySelector("#lot-drawer-close").addEventListener("click",()=>{picker.style.display="none";});
+      picker.addEventListener("click",function onBg(e){
+        if(e.target===picker){picker.style.display="none";picker.removeEventListener("click",onBg);}
+      });
+      inner.querySelector("#lot-drawer-close").addEventListener("click",()=>{picker.style.display="none";});
 
-    const inp=inner.querySelector("#risk-input");
-    inner.querySelector("#risk-clear-btn").addEventListener("click",()=>{
-      inp.value="";
-      updateTables(0);
-    });
+      const inp=inner.querySelector("#risk-input");
+      inner.querySelector("#risk-clear-btn").addEventListener("click",()=>{
+        inp.value="";
+        DB.setSetting("lotRisk",0);
+        updateTables(0);
+      });
 
-    // Input: update tables only — never touch the input element itself
-    let debounce;
-    inp.addEventListener("input",e=>{
-      clearTimeout(debounce);
-      debounce=setTimeout(()=>{
-        const v=parseFloat(e.target.value);
-        updateTables(v>0?v:0);
-      },300);
-    });
+      // Input: update tables only — never touch the input element itself
+      let debounce;
+      inp.addEventListener("input",e=>{
+        clearTimeout(debounce);
+        debounce=setTimeout(()=>{
+          const v=parseFloat(e.target.value);
+          const risk=v>0?v:0;
+          DB.setSetting("lotRisk",risk);
+          updateTables(risk);
+        },300);
+      });
 
-    // Instrument tabs
-    inner.querySelectorAll(".lot-tab").forEach((btn,i)=>{
-      btn.addEventListener("click",()=>{
-        inner.querySelectorAll(".lot-tab").forEach(b=>b.classList.remove("active"));
-        inner.querySelectorAll("[data-ins-panel]").forEach(p=>p.classList.add("hidden"));
-        btn.classList.add("active");
-        inner.querySelector(`[data-ins-panel="${i}"]`)?.classList.remove("hidden");
+      // Instrument tabs
+      inner.querySelectorAll(".lot-tab").forEach((btn,i)=>{
+        btn.addEventListener("click",()=>{
+          inner.querySelectorAll(".lot-tab").forEach(b=>b.classList.remove("active"));
+          inner.querySelectorAll("[data-ins-panel]").forEach(p=>p.classList.add("hidden"));
+          btn.classList.add("active");
+          inner.querySelector(`[data-ins-panel="${i}"]`)?.classList.remove("hidden");
+        });
       });
     });
   },
