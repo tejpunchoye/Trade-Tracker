@@ -391,6 +391,36 @@
         <div class="startup-rule"><span class="rule-dot"></span><p>Trust the <strong>positive expectancy</strong> of your system. One trade never defines you.</p></div>
         <div class="startup-rule"><span class="rule-dot"></span><p>Follow the <strong>checklist every time</strong>. Discipline is your most profitable tool.</p></div>
       </div>
+      <div style="background:var(--bg-3);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:20px;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text-muted);margin-bottom:10px;">If you feel this right now →</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="font-size:12px;font-weight:700;color:var(--danger);min-width:96px;">😰 FOMO</span>
+            <span style="font-size:10px;color:var(--text-muted);flex:1;">→</span>
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);text-align:right;">Wait for confirmation</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="font-size:12px;font-weight:700;color:var(--warning);min-width:96px;">😎 Overconfidence</span>
+            <span style="font-size:10px;color:var(--text-muted);flex:1;">→</span>
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);text-align:right;">Stick to your plan</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="font-size:12px;font-weight:700;color:var(--info);min-width:96px;">😟 Hesitation</span>
+            <span style="font-size:10px;color:var(--text-muted);flex:1;">→</span>
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);text-align:right;">Trust your analysis</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="font-size:12px;font-weight:700;color:var(--text-secondary);min-width:96px;">😑 Boredom</span>
+            <span style="font-size:10px;color:var(--text-muted);flex:1;">→</span>
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);text-align:right;">Step away from the charts</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <span style="font-size:12px;font-weight:700;color:var(--accent);min-width:96px;">😵 Confusion</span>
+            <span style="font-size:10px;color:var(--text-muted);flex:1;">→</span>
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);text-align:right;">Review your higher timeframe</span>
+          </div>
+        </div>
+      </div>
       <button id="startup-dismiss" class="btn btn-primary btn-full">I Can</button>
     </div>
   </div>
@@ -805,13 +835,12 @@ const ChecklistPage={
     const t=(h,min=0)=>h*60+min;
     const sessions=[];
 
-    // London session: 11:00–19:00 MUT → DAX40, FTSE100, XAUUSD, EURUSD
+    // London session: 11:00–19:00 MUT → DAX40, XAUUSD, EURUSD
     if(m>=t(11)&&m<t(19)){
       sessions.push({
         label:"London Session",color:"#5c9eff",dotColor:"#2979ff",tag:"tag-london",tagText:"London",
         assets:[
           {value:"DAX40",  flag:"🇩🇪",desc:"German Index"},
-          {value:"FTSE100",flag:"🇬🇧",desc:"UK Index"},
           {value:"XAUUSD", flag:"🥇",desc:"Gold / USD"},
           {value:"EURUSD", flag:"🇪🇺",desc:"Euro / US Dollar"},
         ]
@@ -1309,7 +1338,6 @@ const Fab={
       {name:"S&P500", flag:"🇺🇸",unit:"pts", tickVal:1,    targets:[50,75,85,100,135,150,170,200],     color:"#00e676"},
       {name:"US30",   flag:"🇺🇸",unit:"pts", tickVal:1,    targets:[100,150,200,300,400,500,600,800],  color:"#ffa502"},
       {name:"DAX40",  flag:"🇩🇪",unit:"pts", tickVal:1,    targets:[100,150,200,250,320,400,480,600],  color:"#ffd600"},
-      {name:"FTSE100",flag:"🇬🇧",unit:"pts", tickVal:1,    targets:[80,100,150,200,240,300,360,500],   color:"#ff4757"},
       {name:"XAUUSD", flag:"🥇", unit:"$mv", tickVal:100,  targets:[0.5,1,1.5,2,3,5,8,10],            color:"#f5c518"},
       {name:"USOUSD", flag:"🛢️", unit:"$mv", tickVal:1000, targets:[0.25,0.5,0.75,1,1.5,2,3,5],       color:"#8b5cf6"},
       {name:"EURUSD", flag:"🇪🇺",unit:"pips",tickVal:10,   targets:[5,8,10,15,20,30,50,100],           color:"#60a5fa"},
