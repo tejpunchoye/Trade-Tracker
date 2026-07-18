@@ -1343,25 +1343,46 @@ const Fab={
       {name:"EURUSD", flag:"🇪🇺",unit:"pips",tickVal:10,   targets:[5,8,10,15,20,30,50,100],           color:"#60a5fa"},
     ];
 
-    const buildRows=(ins,riskUSD)=>ins.targets.map(tgt=>{
-      const lotSize=riskUSD>0?(riskUSD/(tgt*ins.tickVal)).toFixed(2):"—";
-      const pnl=riskUSD>0?`$${riskUSD.toFixed(2)}`:"—";
-      return`<tr>
-        <td style="font-weight:700;color:${ins.color};">${tgt}</td>
-        <td style="color:var(--accent);font-weight:700;font-family:var(--font-mono);font-size:13px;">${lotSize}</td>
-        <td style="color:var(--text-secondary);">${pnl}</td>
-      </tr>`;
-    }).join("");
+    // customTargets[insName] = number | null
+    const customTargets={};
+
+    const buildRows=(ins,riskUSD,customTgt)=>{
+      const allTargets=[...ins.targets];
+      // Append custom target if set and not already in the list
+      if(customTgt>0&&!allTargets.includes(customTgt))allTargets.push(customTgt);
+      return allTargets.map(tgt=>{
+        const isCustom=customTgt>0&&tgt===customTgt;
+        const lotSize=riskUSD>0?(riskUSD/(tgt*ins.tickVal)).toFixed(2):"—";
+        const pnl=riskUSD>0?`$${riskUSD.toFixed(2)}`:"—";
+        return`<tr style="${isCustom?`background:rgba(0,230,118,.07);`:""}">
+          <td style="font-weight:700;color:${isCustom?"var(--accent)":ins.color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${tgt}${isCustom?` <span style="font-size:9px;color:var(--accent);">✦</span>`:""}</td>
+          <td style="color:var(--accent);font-weight:700;font-family:var(--font-mono);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${lotSize}</td>
+          <td style="color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${pnl}</td>
+        </tr>`;
+      }).join("");
+    };
 
     const buildTablesHtml=(riskUSD)=>instruments.map((ins,i)=>{
       const descLabel=ins.unit==="pts"?"$1 per point per lot":ins.unit==="$mv"?`$${ins.tickVal} per $1 move per lot`:`$${ins.tickVal} per pip per lot`;
       const unitLabel=ins.unit==="pts"?"Points":ins.unit==="$mv"?"$ Move":"Pips";
-      return`<div class="lot-table-wrap ${i===0?"":"hidden"}" data-ins-panel="${i}" style="padding-bottom:4px;">
+      const customTgt=customTargets[ins.name]||0;
+      const customInput=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);white-space:nowrap;">Custom ${unitLabel}:</div>
+        <input type="number" class="custom-tgt-input" data-ins-name="${ins.name}" placeholder="e.g. ${ins.targets[Math.floor(ins.targets.length/2)]}" min="0" max="9999" step="${ins.unit==="$mv"?0.1:1}" value="${customTgt||""}"
+          style="flex:1;background:var(--input-bg);border:1.5px solid ${customTgt>0?"var(--accent)":"var(--border)"};border-radius:8px;color:var(--text-primary);padding:7px 10px;font-size:13px;font-family:var(--font-mono);outline:none;-moz-appearance:textfield;appearance:textfield;transition:border-color .2s;"
+          oninput="if(this.value.replace('.','').length>4)this.value=this.value.slice(0,this.value.includes('.')?5:4)"/>
+      </div>`;
+      return`<div class="lot-table-wrap ${i===0?"":"hidden"}" data-ins-panel="${i}" data-ins-name-panel="${ins.name}" style="padding-bottom:4px;">
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;text-align:center;">${descLabel}</div>
+        ${customInput}
         ${riskUSD>0
-          ?`<div style="overflow-x:auto;"><table class="lot-tbl">
-              <thead><tr><th>${unitLabel}</th><th style="color:var(--accent);">Lot Size</th><th>P&amp;L at Risk</th></tr></thead>
-              <tbody>${buildRows(ins,riskUSD)}</tbody>
+          ?`<div style="overflow-x:auto;"><table class="lot-tbl" style="table-layout:fixed;width:100%;">
+              <thead><tr>
+                <th style="width:38%;">Points</th>
+                <th style="width:32%;color:var(--accent);">Lot Size</th>
+                <th style="width:30%;">Risk</th>
+              </tr></thead>
+              <tbody>${buildRows(ins,riskUSD,customTgt)}</tbody>
             </table></div>`
           :`<div style="text-align:center;padding:20px 0;color:var(--text-muted);font-size:13px;">Enter a risk amount above to see lot sizes.</div>`}
       </div>`;
@@ -1371,6 +1392,13 @@ const Fab={
     const updateTables=(riskUSD)=>{
       const tablesWrap=inner.querySelector("#lot-tables-wrap");
       if(tablesWrap)tablesWrap.innerHTML=buildTablesHtml(riskUSD);
+      // Re-bind custom inputs after tables re-render
+      bindCustomInputs();
+      // Restore active tab visibility
+      inner.querySelectorAll(".lot-tab").forEach((b,i)=>{
+        const panel=inner.querySelector(`[data-ins-panel="${i}"]`);
+        if(panel)panel.classList.toggle("hidden",!b.classList.contains("active"));
+      });
       // Update hint text and border
       const hint=inner.querySelector("#risk-hint");
       const inp=inner.querySelector("#risk-input");
@@ -1443,6 +1471,54 @@ const Fab={
           inner.querySelector(`[data-ins-panel="${i}"]`)?.classList.remove("hidden");
         });
       });
+
+      // Custom target inputs — update only the tbody of the affected instrument
+      const bindCustomInputs=()=>{
+        inner.querySelectorAll(".custom-tgt-input").forEach(inp=>{
+          let cd;
+          inp.addEventListener("input",e=>{
+            clearTimeout(cd);
+            cd=setTimeout(()=>{
+              const name=e.target.dataset.insName;
+              const v=parseFloat(e.target.value);
+              customTargets[name]=v>0?v:0;
+              // Find the instrument
+              const ins=instruments.find(x=>x.name===name);
+              if(!ins)return;
+              const currentRisk=parseFloat(inner.querySelector("#risk-input")?.value)||0;
+              // Update only the tbody of this instrument's panel
+              const panel=inner.querySelector(`[data-ins-name-panel="${name}"]`);
+              if(panel){
+                const tbody=panel.querySelector("tbody");
+                if(tbody)tbody.innerHTML=buildRows(ins,currentRisk,customTargets[name]||0);
+                // Update border colour on the custom input
+                e.target.style.borderColor=customTargets[name]>0?"var(--accent)":"var(--border)";
+                // Show/hide clear button
+                let clearBtn=panel.querySelector(".custom-tgt-clear");
+                if(customTargets[name]>0&&!clearBtn){
+                  clearBtn=document.createElement("button");
+                  clearBtn.className="custom-tgt-clear";
+                  clearBtn.dataset.insName=name;
+                  clearBtn.textContent="Clear";
+                  clearBtn.style.cssText="font-size:11px;color:var(--text-muted);background:var(--bg-4);border:1px solid var(--border);border-radius:6px;padding:5px 8px;cursor:pointer;white-space:nowrap;flex-shrink:0;";
+                  e.target.parentElement.appendChild(clearBtn);
+                  clearBtn.addEventListener("click",()=>{
+                    customTargets[name]=0;
+                    e.target.value="";
+                    e.target.style.borderColor="var(--border)";
+                    clearBtn.remove();
+                    const tb=panel.querySelector("tbody");
+                    if(tb)tb.innerHTML=buildRows(ins,parseFloat(inner.querySelector("#risk-input")?.value)||0,0);
+                  });
+                } else if(customTargets[name]<=0&&clearBtn){
+                  clearBtn.remove();
+                }
+              }
+            },300);
+          });
+        });
+      };
+      bindCustomInputs();
     });
   },
   showStrategy(){
