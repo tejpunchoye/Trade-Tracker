@@ -516,6 +516,7 @@
 <div id="fab-tray" class="fab-tray hidden">
   <div class="fab-tray-item" id="tray-lot-table"><div class="fab-tray-icon">📊</div><div class="fab-tray-label">Lot Table</div></div>
   <div class="fab-tray-item" id="tray-eco-cal"><div class="fab-tray-icon">📅</div><div class="fab-tray-label">Economic Calendar</div></div>
+  <div class="fab-tray-item" id="tray-sessions"><div class="fab-tray-icon">🕐</div><div class="fab-tray-label">Session Times</div></div>
   <div class="fab-tray-item" id="tray-strategy"><div class="fab-tray-icon">⭐</div><div class="fab-tray-label">Strategy</div></div>
 </div>
 
@@ -1310,6 +1311,7 @@ const Fab={
     document.getElementById("fab-overlay").addEventListener("click",()=>this.close());
     document.getElementById("tray-lot-table").addEventListener("click",()=>{this.close();this.showLotTable();});
     document.getElementById("tray-eco-cal").addEventListener("click",()=>{this.close();this.showEcoCal();});
+    document.getElementById("tray-sessions").addEventListener("click",()=>{this.close();this.showSessions();});
     document.getElementById("tray-strategy").addEventListener("click",()=>{this.close();this.showStrategy();});
   },
   toggle(){this._open?this.close():this.open();},
@@ -1521,103 +1523,291 @@ const Fab={
       bindCustomInputs();
     });
   },
+  showSessions(){
+    document.getElementById("sessions-page-el")?.remove();
+    const page=document.createElement("div");page.id="sessions-page-el";page.className="strategy-slide-page";
+
+    // Sessions — only Sydney, Tokyo, London, New York (Forex), New York (Stocks)
+    const sessions=[
+      {name:"Sydney",        utc:"22:00–07:00", mut:"02:00–11:00", color:"#60a5fa", start:2*60,   end:11*60},
+      {name:"Tokyo",         utc:"23:00–08:00", mut:"03:00–12:00", color:"#a78bfa", start:3*60,   end:12*60},
+      {name:"London",        utc:"08:00–16:00", mut:"12:00–20:00", color:"#2979ff", start:12*60,  end:20*60},
+      {name:"New York",      utc:"12:00–22:00", mut:"16:00–02:00", color:"#00e676", start:16*60,  end:26*60},
+      {name:"NY Stock Mkt",  utc:"13:00–22:00", mut:"17:00–02:00", color:"#ffa502", start:17*60,  end:26*60},
+    ];
+
+    // Killzones in MUT
+    const killzones=[
+      {name:"Asian Killzone",    start:3*60,  end:6*60,  color:"#f5c518", overlap:"Tokyo / Asian open",      vol:"Moderate", note:"Early range formation, liquidity grabs, sets daily bias."},
+      {name:"London Killzone",   start:12*60, end:15*60, color:"#2979ff", overlap:"London open",             vol:"High",     note:"Strong institutional moves, volatility spikes, key setups."},
+      {name:"New York Killzone", start:17*60, end:20*60, color:"#00e676", overlap:"NY open + London overlap", vol:"High",     note:"Highest liquidity window of the day — prime entry zone."},
+    ];
+
+    const now=new Date();
+    const mutMin=(now.getUTCHours()*60+now.getUTCMinutes()+4*60)%(24*60);
+    const isActive=(s)=>s.end<=24*60?mutMin>=s.start&&mutMin<s.end:mutMin>=s.start||(mutMin<s.end-24*60);
+    const activeKZ=killzones.find(k=>mutMin>=k.start&&mutMin<k.end);
+    const activeNow=sessions.filter(s=>isActive(s));
+    const overlap=activeNow.length>1;
+
+    // Which KZ overlaps this session's timespan?
+    const sessionKZ=(s)=>killzones.filter(k=>{
+      // Check if killzone overlaps with session window
+      const kStart=k.start, kEnd=k.end;
+      const sStart=s.start, sEnd=s.end>24*60?s.end-24*60:s.end;
+      // KZ is always within a day (no midnight cross for KZs)
+      if(s.end<=24*60) return k.start<s.end&&k.end>s.start;
+      return k.start>=s.start||k.end<=sEnd;
+    });
+
+    const sessionRows=sessions.map(s=>{
+      const active=isActive(s);
+      // Is there an active killzone that falls within this session?
+      const kzInSession=killzones.filter(k=>{
+        if(s.end<=24*60) return k.start<s.end&&k.end>s.start;
+        return k.start>=s.start||(k.end<=(s.end-24*60));
+      });
+      const activeKZHere=kzInSession.find(k=>mutMin>=k.start&&mutMin<k.end);
+      const kzBadge=activeKZHere
+        ?`<span style="font-size:9px;background:${activeKZHere.color}22;color:${activeKZHere.color};padding:1px 5px;border-radius:8px;font-weight:700;margin-left:4px;">🎯 KZ</span>`
+        :"";
+      const liveBadge=active
+        ?`<span style="font-size:9px;background:${s.color}22;color:${s.color};padding:1px 5px;border-radius:8px;font-weight:700;margin-left:4px;">LIVE</span>`
+        :"";
+      const bg=active?`background:${s.color}18;`:"";
+      const border=active?`border-left:3px solid ${s.color};`:"border-left:3px solid transparent;";
+      return`<tr style="${bg}${border}transition:.3s;">
+        <td style="padding:10px 8px;">
+          <div style="font-weight:700;color:${active?s.color:"var(--text-primary)"};font-size:12px;display:flex;align-items:center;flex-wrap:wrap;gap:2px;">${s.name}${liveBadge}${kzBadge}</div>
+        </td>
+        <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);padding:10px 6px;white-space:nowrap;">${s.utc}</td>
+        <td style="font-family:var(--font-mono);font-size:10px;color:${active?"var(--text-primary)":"var(--text-secondary)"};font-weight:${active?"700":"400"};padding:10px 6px;white-space:nowrap;">${s.mut}</td>
+      </tr>`;
+    }).join("");
+
+    const kzRows=killzones.map(k=>{
+      const active=mutMin>=k.start&&mutMin<k.end;
+      return`<tr style="${active?`background:${k.color}15;`:""}transition:.3s;">
+        <td style="padding:10px 8px;">
+          <div style="font-size:11.5px;font-weight:700;color:${active?k.color:"var(--text-primary)"};">${k.name}${active?" 🔥":""}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">${k.note}</div>
+        </td>
+        <td style="font-family:var(--font-mono);font-size:10px;color:var(--text-secondary);padding:10px 6px;white-space:nowrap;vertical-align:top;">${String(k.start/60).padStart(2,"0")}:00–${String(k.end/60).padStart(2,"0")}:00<br><span style="color:var(--text-muted);">MUT</span></td>
+        <td style="font-size:10px;color:${k.vol==="High"?"var(--accent)":"var(--warning)"};font-weight:700;padding:10px 6px;vertical-align:top;">${k.vol}</td>
+      </tr>`;
+    }).join("");
+
+    const overlapBanner=overlap?`<div style="background:rgba(255,165,2,.1);border:1px solid rgba(255,165,2,.3);border-radius:10px;padding:10px 12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">⚡</span><div><div style="font-size:11px;font-weight:700;color:var(--warning);">Session Overlap Active</div><div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;">${activeNow.map(s=>s.name).join(" + ")} — Higher liquidity & volatility</div></div></div>`:"";
+    const kzBanner=activeKZ?`<div style="background:${activeKZ.color}15;border:1px solid ${activeKZ.color}40;border-radius:10px;padding:10px 12px;margin-bottom:12px;display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">🎯</span><div><div style="font-size:11px;font-weight:700;color:${activeKZ.color};">Killzone Active: ${activeKZ.name}</div><div style="font-size:10.5px;color:var(--text-muted);margin-top:2px;">${activeKZ.overlap} · ${activeKZ.vol} volume · ${activeKZ.note}</div></div></div>`:"";
+
+    page.innerHTML=`
+      <div class="strategy-slide-topbar">
+        <button class="strategy-slide-back" id="sess-back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span class="eco-cal-title">🕐 Session Times</span>
+      </div>
+      <div class="strategy-slide-body" style="padding:14px;">
+        ${overlapBanner}${kzBanner}
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:8px;">Market Sessions</div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead><tr style="background:var(--bg-3);">
+              <th style="padding:8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);">Session</th>
+              <th style="padding:8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);">UTC</th>
+              <th style="padding:8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--accent);">MUT</th>
+            </tr></thead>
+            <tbody>${sessionRows}</tbody>
+          </table>
+        </div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:8px;">Killzones</div>
+        <div style="background:var(--card-bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead><tr style="background:var(--bg-3);">
+              <th style="padding:8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);">Killzone</th>
+              <th style="padding:8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);">MUT</th>
+              <th style="padding:8px;text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);">Vol</th>
+            </tr></thead>
+            <tbody>${kzRows}</tbody>
+          </table>
+        </div>
+        <div style="font-size:10px;color:var(--text-muted);text-align:center;padding-bottom:8px;">All times MUT (UTC+4) · 🎯 KZ = Killzone active in session</div>
+      </div>`;
+    document.body.appendChild(page);
+    page.querySelector("#sess-back").addEventListener("click",()=>{page.classList.add("slide-exit");setTimeout(()=>page.remove(),280);});
+  },
+
   showStrategy(){
     document.getElementById("strategy-page-el")?.remove();
     const page=document.createElement("div");page.id="strategy-page-el";page.className="strategy-slide-page";
+
+    const tabs=[
+      {id:"main",   label:"Main",         icon:"📊"},
+      {id:"xauusd", label:"XAUUSD",       icon:"🥇"},
+      {id:"fvg",    label:"FVG",          icon:"📐"},
+      {id:"ob",     label:"Order Block",  icon:"📦"},
+      {id:"notes",  label:"Notes",        icon:"📝"},
+      {id:"risk",   label:"Risk",         icon:"🛡️"},
+    ];
+
+    const contents={
+      main:`
+        <div class="strategy-card">
+          <div class="strategy-card-title">📊 HTF Bias Determination</div>
+          <p>Determine market direction on the higher timeframe.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+            <div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);border-radius:10px;padding:10px;">
+              <div style="font-size:10px;font-weight:700;color:var(--accent);margin-bottom:4px;">BULLISH</div>
+              <div style="font-size:12px;color:var(--text-secondary);">Price forming Higher Highs (HH)</div>
+            </div>
+            <div style="background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.25);border-radius:10px;padding:10px;">
+              <div style="font-size:10px;font-weight:700;color:var(--danger);margin-bottom:4px;">BEARISH</div>
+              <div style="font-size:12px;color:var(--text-secondary);">Price forming Lower Lows (LL)</div>
+            </div>
+          </div>
+          <p style="margin-top:10px;font-size:12px;">The <strong>Initial Balance</strong> of each session (first 1 hour) helps confirm the trend direction for that session.</p>
+        </div>
+        <div class="strategy-card">
+          <div class="strategy-card-title">🎯 New York Open Sequence</div>
+          <div class="entry-model-steps" style="margin-top:6px;">
+            <div class="entry-model-step">Wait for price to <strong>sweep liquidity</strong> at NY open</div>
+            <div class="entry-model-step"><strong>Sell setup:</strong> Price sweeps the previous session's High</div>
+            <div class="entry-model-step"><strong>Buy setup:</strong> Price sweeps the previous session's Low</div>
+            <div class="entry-model-step">Price must then <strong>mitigate a high-volume zone</strong> — POC, VAH, or VAL</div>
+            <div class="entry-model-step">Once liquidity swept and POI mitigated → drop to lower timeframe for entry</div>
+          </div>
+        </div>
+        <div class="strategy-card">
+          <div class="strategy-card-title">📉 Lower Timeframe Entry Triggers</div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+            <div style="background:var(--bg-3);border-radius:8px;padding:10px 12px;border-left:3px solid var(--accent);">
+              <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">iFVG Trigger</div>
+              <div style="font-size:12px;color:var(--text-secondary);"><strong>Buy:</strong> price closes above the last bearish FVG.<br><strong>Sell:</strong> price closes below the last bullish FVG.</div>
+            </div>
+            <div style="background:var(--bg-3);border-radius:8px;padding:10px 12px;border-left:3px solid #a78bfa;">
+              <div style="font-size:11px;font-weight:700;color:#a78bfa;margin-bottom:3px;">Flip Pattern</div>
+              <div style="font-size:12px;color:var(--text-secondary);">Demand→Supply or Supply→Demand flip — anticipate a trade.</div>
+            </div>
+            <div style="background:var(--bg-3);border-radius:8px;padding:10px 12px;border-left:3px solid var(--warning);">
+              <div style="font-size:11px;font-weight:700;color:var(--warning);margin-bottom:3px;">V-Shape Pattern</div>
+              <div style="font-size:12px;color:var(--text-secondary);">V-Shape recovery from the POI — anticipate a trade.</div>
+            </div>
+          </div>
+        </div>`,
+
+      xauusd:`
+        <div class="entry-model-card" style="border-color:rgba(245,197,24,.3);background:rgba(245,197,24,.04);">
+          <div class="entry-model-num" style="color:#f5c518;">🐂 BULLISH — DOL: Nearby 4H Low</div>
+          <div class="entry-model-name" style="font-size:13px;">Big &amp; obvious bullish 4H FVG in discount zone</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">If FVG not in discount zone → review 1D timeframe</div>
+          <div class="entry-model-steps">
+            <div class="entry-model-step">Upon 4H FVG mitigation, wait for previous session's <strong>low liquidity sweep</strong></div>
+            <div class="entry-model-step">If price reacts to a <strong>resistance → supply to support → demand flip</strong>, anticipate a trade</div>
+            <div class="entry-model-step">On <strong>4M</strong>: wait for price to close above the last bearish FVG</div>
+            <div class="entry-model-step">If price creates a <strong>Flip Pattern</strong> on 4M — anticipate a trade</div>
+          </div>
+        </div>
+        <div class="entry-model-card" style="border-color:rgba(255,71,87,.3);background:rgba(255,71,87,.04);">
+          <div class="entry-model-num" style="color:var(--danger);">🐻 BEARISH — DOL: Nearby 4H High</div>
+          <div class="entry-model-name" style="font-size:13px;">Big &amp; obvious bearish 4H FVG in premium zone</div>
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">If FVG not in premium zone → review 1D timeframe</div>
+          <div class="entry-model-steps">
+            <div class="entry-model-step">Upon 4H FVG mitigation, wait for previous session's <strong>high liquidity sweep</strong></div>
+            <div class="entry-model-step">If price reacts to a <strong>support → demand to resistance → supply flip</strong>, anticipate a trade</div>
+            <div class="entry-model-step">On <strong>4M</strong>: wait for price to close below the last bullish FVG</div>
+            <div class="entry-model-step">If price creates a <strong>Flip Pattern</strong> on 4M — anticipate a trade</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,71,87,.08);border:1px solid rgba(255,71,87,.3);border-radius:10px;padding:10px 12px;">
+          <div style="font-size:11px;font-weight:700;color:var(--danger);">⚠ Invalidation</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">Trade is invalid when price breaks the FVG.</div>
+        </div>`,
+
+      fvg:`
+        <div class="strategy-card">
+          <div class="strategy-card-title">FVG Strategy — Step by Step</div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+            ${["Mark the <strong>1 Day FVG</strong>","Mark the <strong>4H Range</strong>","Wait for price to retrace to the <strong>50% of the 4H range</strong>","Wait for price to close after the <strong>5M FVG</strong> of the 4H 50% retracement"].map((t,i)=>`
+            <div style="display:flex;gap:12px;align-items:flex-start;">
+              <div style="min-width:26px;height:26px;border-radius:50%;background:var(--accent-glow);border:1.5px solid var(--accent);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
+              <div style="font-size:13px;color:var(--text-secondary);padding-top:4px;">${t}</div>
+            </div>`).join("")}
+          </div>
+        </div>`,
+
+      ob:`
+        <div class="strategy-card">
+          <div class="strategy-card-title">Valid 15M OB requires:</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+            ${["Liquidity Sweep","FVG","BOS"].map(r=>`<span style="background:var(--accent-glow);border:1px solid var(--accent);color:var(--accent);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:700;">${r}</span>`).join("")}
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+          ${[
+            ["MODEL 1","1M V-Shape Recovery","from the FVG","var(--accent)"],
+            ["MODEL 2","1M V-Shape Recovery","from the OB","var(--accent)"],
+            ["MODEL 3","1M OB Mitigation","retest of the OB zone","#a78bfa"],
+            ["MODEL 4","Flip Pattern","Supply→Demand / Demand→Supply","var(--warning)"],
+          ].map(([num,name,desc,col])=>`<div style="background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:12px;">
+            <div style="font-size:9px;font-weight:700;color:${col};margin-bottom:5px;text-transform:uppercase;">${num}</div>
+            <div style="font-size:12px;font-weight:700;color:var(--text-primary);">${name}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:3px;">${desc}</div>
+          </div>`).join("")}
+        </div>`,
+
+      notes:`
+        <div class="strategy-card" style="padding:14px 16px;">
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            ${[
+              "HTF CHoCH should be confirmed with a BOS with FVG — else it is a liquidity sweep.",
+              "Monday sweeps the previous week's POC.",
+              "Always give the stop loss enough room to breathe so that even in case of an inducement you are not stopped out.",
+              "First liquidity sweep followed by a retest is the ideal entry trigger.",
+              "If price mitigates a zone and rejects strongly from the POI without a V-Shape or other entry model — wait for price to mitigate the FVG left by the strong rejection.",
+              "Market open gaps tend to get filled during the week.",
+            ].map((t,i)=>`<div style="display:flex;gap:10px;align-items:flex-start;">
+              <span style="min-width:20px;height:20px;border-radius:50%;background:var(--accent-glow);border:1px solid var(--accent);color:var(--accent);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">${i+1}</span>
+              <span style="font-size:12.5px;color:var(--text-secondary);line-height:1.55;">${t}</span>
+            </div>`).join("")}
+          </div>
+        </div>`,
+
+      risk:`
+        <div class="risk-rules">
+          <div class="risk-rule"><span class="risk-rule-icon">📐</span><p><strong>1:2 Minimum RR</strong> — Never enter unless target is at least 2× the risk.</p></div>
+          <div class="risk-rule"><span class="risk-rule-icon">💼</span><p><strong>1% Risk Per Trade</strong> — Risk exactly 1% of account per position.</p></div>
+          <div class="risk-rule"><span class="risk-rule-icon">🛑</span><p><strong>Max 3 Losses Per Day</strong> — After 3 losses, close the platform. No revenge trading.</p></div>
+          <div class="risk-rule"><span class="risk-rule-icon">🎯</span><p><strong>Max 2–3 Trades Per Day</strong> — Quality over quantity. Wait for A+ setups only.</p></div>
+          <div class="risk-rule"><span class="risk-rule-icon">🧠</span><p><strong>SL Room</strong> — Give stop loss enough space to breathe through inducements.</p></div>
+        </div>`,
+    };
+
+    const tabBar=tabs.map((t,i)=>`<button class="strat-tab ${i===0?"strat-tab-active":""}" data-strat-tab="${t.id}" style="flex:1;padding:8px 4px;border-radius:8px;font-size:10px;font-weight:700;color:${i===0?"var(--text-primary)":"var(--text-muted)"};background:${i===0?"var(--card-bg)":"none"};border:none;cursor:pointer;font-family:var(--font-body);transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${t.label}">${t.icon}<br>${t.label}</button>`).join("");
+
     page.innerHTML=`
       <div class="strategy-slide-topbar">
         <button class="strategy-slide-back" id="strat-back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7 7M5 12l7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <span class="eco-cal-title">⭐ Strategy</span>
       </div>
-      <div class="strategy-slide-body">
-        <div class="strategy-hero">
-          <div class="strategy-hero-title">Trading Strategy</div>
-          <div class="strategy-hero-sub">Session · 4H+15M Bias · 15M Confirmation · POI · 6 Entry Models</div>
-        </div>
-
-        <div class="strategy-section">
-          <div class="strategy-section-title">Sessions</div>
-          <div class="strategy-card" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-            <div style="background:rgba(41,121,255,.08);border:1px solid rgba(41,121,255,.25);border-radius:12px;padding:14px;">
-              <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:#2979ff;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">London</div>
-              <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">11:00 – 19:00 MUT</div>
-              <div style="font-size:11.5px;color:var(--text-muted);line-height:1.5;">Major EUR/GBP liquidity — sweeps at the open.</div>
-            </div>
-            <div style="background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.25);border-radius:12px;padding:14px;">
-              <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">NY — Forex</div>
-              <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">16:00 – 01:00 MUT</div>
-              <div style="font-size:11.5px;color:var(--text-muted);line-height:1.5;">Best setups in first 90 min after open.</div>
-            </div>
-            <div style="background:rgba(255,165,2,.08);border:1px solid rgba(255,165,2,.25);border-radius:12px;padding:14px;grid-column:1/-1;">
-              <div style="font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--warning);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">NY — Stocks</div>
-              <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">17:30 – 00:30 MUT</div>
-              <div style="font-size:11.5px;color:var(--text-muted);line-height:1.5;">NYSE open — focus on NAS100, S&P500, US30.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="strategy-section">
-          <div class="strategy-section-title">Market Bias (4H + 15M)</div>
-          <div class="strategy-card"><div class="strategy-card-title">🐂 Bullish</div><p><strong>4H:</strong> Higher Highs + Higher Lows, price above 200 EMA. <strong>15M:</strong> Confirms bullish structure or healthy pullback. Only look for long setups.</p></div>
-          <div class="strategy-card"><div class="strategy-card-title">🐻 Bearish</div><p><strong>4H:</strong> Lower Highs + Lower Lows, price below 200 EMA. <strong>15M:</strong> Confirms bearish structure or bounce in downtrend. Only look for short setups.</p></div>
-          <div class="strategy-card"><div class="strategy-card-title">🔀 Consolidation — Stay Out</div><p>No clear structure on either timeframe. Wait for directional confirmation on the 4H.</p></div>
-        </div>
-
-        <div class="strategy-section">
-          <div class="strategy-section-title">15M Confirmation</div>
-          <div class="strategy-card">
-            <div class="strategy-steps">
-              <div class="strategy-step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Mark Asian IB</div><div class="step-desc">High and low of Asian session (02:00–03:00 MUT) — these act as magnets or rejection zones.</div></div></div>
-              <div class="strategy-step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Is the 15M Played Out?</div><div class="step-desc">Has the 15M shown its displacement for this session? If yes, look for the reaction entry. If no — wait.</div></div></div>
-              <div class="strategy-step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Spot Liquidity & FVG</div><div class="step-desc">Identify swing highs/lows, equal H/L, or unmitigated FVG on the 15M.</div></div></div>
-              <div class="strategy-step"><div class="step-num">4</div><div class="step-body"><div class="step-title">Drop to 1M for Entry</div><div class="step-desc">Once 15M is confirmed, drop to 1M to find precise entry using one of the six models.</div></div></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="strategy-section">
-          <div class="strategy-section-title">Entry Models</div>
-          <div class="entry-model-card"><div class="entry-model-num">Model 01</div><div class="entry-model-name">V-Shape Recovery</div><div class="entry-model-steps"><div class="entry-model-step">Key level tapped (Liquidity / FVG / VAL / VAH / POC / Session level)</div><div class="entry-model-step">Level mitigated or swept clean</div><div class="entry-model-step">Clean V-shape recovery begins forming away from level</div><div class="entry-model-step">Entry on completion of the V-shape. SL beyond wick. TP min 1:2 RR.</div></div></div>
-          <div class="entry-model-card"><div class="entry-model-num">Model 02</div><div class="entry-model-name">Order Block Mitigation + Strong Rejection</div><div class="entry-model-steps"><div class="entry-model-step">Strong impulse creates an Order Block (last opposing candle before impulse)</div><div class="entry-model-step">Price retraces back into the OB zone (mitigation)</div><div class="entry-model-step">Strong rejection from OB: long wick, decisive close away</div><div class="entry-model-step">Entry on rejection close or retest of candle body. SL beyond OB. TP min 1:2 RR.</div></div></div>
-          <div class="entry-model-card"><div class="entry-model-num">Model 03</div><div class="entry-model-name">iFVG Entry</div><div class="entry-model-steps"><div class="entry-model-step">Previously bullish FVG broken bearishly (or vice versa) — inverted role</div><div class="entry-model-step">Entry after the candle following iFVG formation fully closes</div><div class="entry-model-step">SL above/below iFVG zone. TP at next key level, min 1:2 RR.</div></div></div>
-          <div class="entry-model-card"><div class="entry-model-num">Model 04</div><div class="entry-model-name">iFVG Mitigation + Strong Rejection</div><div class="entry-model-steps"><div class="entry-model-step">iFVG level clearly identified and marked</div><div class="entry-model-step">Price retraces back into the iFVG for mitigation</div><div class="entry-model-step">Strong rejection candle at iFVG — entry signal confirmed. SL beyond zone. TP min 1:2 RR.</div></div></div>
-          <div class="entry-model-card" style="border-color:rgba(255,165,2,.3);background:rgba(255,165,2,.04);">
-            <div class="entry-model-num" style="color:var(--warning);">Model 05</div>
-            <div class="entry-model-name">FBS — Failed to Break Structure</div>
-            <div class="entry-model-steps">
-              <div class="entry-model-step">Clear support/resistance structure level identified</div>
-              <div class="entry-model-step">Price makes a breakout attempt — candle closes beyond the level</div>
-              <div class="entry-model-step">Breakout fails — price reverses back through, trapping breakout traders</div>
-              <div class="entry-model-step">Confirmation candle closes decisively in the failure direction — entry confirmed</div>
-            </div>
-          </div>
-          <div class="entry-model-card" style="border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.04);margin-bottom:0;">
-            <div class="entry-model-num" style="color:#a78bfa;">Model 06</div>
-            <div class="entry-model-name">Flip Pattern — Demand/Supply Role Reversal</div>
-            <div class="entry-model-steps">
-              <div class="entry-model-step">Demand zone (support) or supply zone (resistance) identified — price has respected it multiple times</div>
-              <div class="entry-model-step">Zone broken with strong, impulsive displacement candle — the zone fails to hold</div>
-              <div class="entry-model-step">Role reversal confirmed — broken demand now acts as new supply (or vice versa)</div>
-              <div class="entry-model-step">Price pulls back to test the newly flipped zone for the first time</div>
-              <div class="entry-model-step">Clear rejection at flipped zone — entry confirmed. SL beyond zone. TP min 1:2 RR.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="strategy-section">
-          <div class="strategy-section-title">Risk Management</div>
-          <div class="risk-rules">
-            <div class="risk-rule"><span class="risk-rule-icon">🛡️</span><p><strong>Stop Loss Beyond Structure</strong> — Always place SL beyond the swing high/low or key zone that invalidates the setup.</p></div>
-            <div class="risk-rule"><span class="risk-rule-icon">📐</span><p><strong>Minimum 1:2 Risk-to-Reward</strong> — Never take a trade unless your target is at least 2× the risk.</p></div>
-            <div class="risk-rule"><span class="risk-rule-icon">💼</span><p><strong>Fixed Risk Per Trade</strong> — Risk a consistent % of account per trade (0.5–1%). Calculate lot size accordingly.</p></div>
-            <div class="risk-rule"><span class="risk-rule-icon">📰</span><p><strong>Avoid High-Impact News</strong> — Do not enter within 30 minutes of FOMC, CPI, NFP, or other major releases.</p></div>
-            <div class="risk-rule"><span class="risk-rule-icon">🧠</span><p><strong>One Quality Setup at a Time</strong> — Wait for the A+ setup with full confluence.</p></div>
-          </div>
+      <div style="padding:8px 12px;background:var(--nav-bg);border-bottom:1px solid var(--border);display:flex;gap:4px;background:var(--bg-3);">${tabBar}</div>
+      <div class="strategy-slide-body" id="strat-body" style="padding:14px;">
+        <div class="strategy-section" style="padding:0;">
+          <div id="strat-content">${contents.main}</div>
         </div>
         <div style="height:24px;"></div>
       </div>`;
+
     document.body.appendChild(page);
     page.querySelector("#strat-back").addEventListener("click",()=>{page.classList.add("slide-exit");setTimeout(()=>page.remove(),280);});
+    page.querySelectorAll(".strat-tab").forEach(btn=>{
+      btn.addEventListener("click",()=>{
+        page.querySelectorAll(".strat-tab").forEach(b=>{
+          b.style.background="none";b.style.color="var(--text-muted)";b.classList.remove("strat-tab-active");
+        });
+        btn.style.background="var(--card-bg)";btn.style.color="var(--text-primary)";btn.classList.add("strat-tab-active");
+        const body=page.querySelector("#strat-body");
+        page.querySelector("#strat-content").innerHTML=contents[btn.dataset.stratTab]||"";
+        body.scrollTo({top:0,behavior:"instant"});
+      });
+    });
   }
 };
 
