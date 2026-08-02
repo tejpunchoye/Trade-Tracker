@@ -885,53 +885,44 @@ function normalizeTab(tab){
 }
 /* ============================================================
    PERSISTENCE
-   Uses window.storage when running inside a Claude.ai artifact
-   (that API isn't real localStorage and only exists in that host).
-   Everywhere else — a standalone deployment, GitHub Pages, etc. —
-   it transparently falls back to the browser's real localStorage,
-   so the exact same code works in both environments.
+   Always uses the browser's real localStorage (plain text/JSON
+   under the keys tt_tabs, tt_trades, tt_lot). If localStorage is
+   blocked or inaccessible in the current environment (some sandboxed
+   iframes throw on access), it falls back to an in-memory store so
+   the app still works for the current session — it just won't
+   survive a reload in that specific case.
 ============================================================ */
-const STORAGE_MODE = (typeof window !== 'undefined' && window.storage && typeof window.storage.get === 'function' && typeof window.storage.set === 'function')
-  ? 'artifact'
-  : 'local';
+const memoryStorage = {};
+let localStorageAvailable = true;
+try{
+  const testKey = '__tt_ls_test__';
+  window.localStorage.setItem(testKey, '1');
+  window.localStorage.removeItem(testKey);
+}catch(e){
+  localStorageAvailable = false;
+  console.warn('Browser localStorage is not available in this environment — using in-memory storage for this session only.', e);
+}
+const STORAGE_MODE = localStorageAvailable ? 'local' : 'memory';
 
 async function storageGetSafe(key){
-  if(STORAGE_MODE === 'artifact'){
-    try{
-      const r = await window.storage.get(key, false);
-      return (r && typeof r.value === 'string') ? r.value : null;
-    }catch(e){
-      console.warn(`Reading "${key}" from artifact storage failed:`, e);
-      return null;
-    }
+  if(!localStorageAvailable){
+    return Object.prototype.hasOwnProperty.call(memoryStorage, key) ? memoryStorage[key] : null;
   }
   try{
     return window.localStorage.getItem(key);
   }catch(e){
-    // localStorage can throw in private-browsing modes or when disabled
     console.warn(`Reading "${key}" from localStorage failed:`, e);
-    return null;
+    return Object.prototype.hasOwnProperty.call(memoryStorage, key) ? memoryStorage[key] : null;
   }
 }
 
-async function storageSetSafe(key, value, attempt){
-  attempt = attempt || 1;
-  if(STORAGE_MODE === 'artifact'){
-    try{
-      await window.storage.set(key, value, false);
-    }catch(e){
-      if(attempt < 2){
-        await new Promise(res=>setTimeout(res, 700));
-        return storageSetSafe(key, value, attempt+1);
-      }
-      console.warn(`Persisting "${key}" failed (will retry on next change):`, e);
-    }
-    return;
-  }
+async function storageSetSafe(key, value){
+  memoryStorage[key] = value; // always keep an in-memory mirror as a safety net
+  if(!localStorageAvailable) return;
   try{
     window.localStorage.setItem(key, value);
   }catch(e){
-    console.warn(`Persisting "${key}" to localStorage failed:`, e);
+    console.warn(`Persisting "${key}" to localStorage failed (kept in memory for this session):`, e);
   }
 }
 
@@ -1542,7 +1533,8 @@ function renderSettingsPage(){
   infoCard.className = 'section-card';
   infoCard.innerHTML = `
     <div class="section-head"><div class="section-title-wrap"><div class="section-eyebrow">System</div><div class="section-title">Storage &amp; About</div></div></div>
-    <div class="settings-info-row"><span>Storage mode</span><span class="settings-badge">${STORAGE_MODE === 'artifact' ? 'Claude Artifact Storage' : 'Browser LocalStorage'}</span></div>
+    <div class="settings-info-row"><span>Storage mode</span><span class="settings-badge">${STORAGE_MODE === 'local' ? 'Browser LocalStorage' : 'In-Memory (this session only)'}</span></div>
+    ${STORAGE_MODE === 'memory' ? `<div class="settings-about" style="color:var(--gold);margin-top:8px;">localStorage isn't accessible in this environment, so data won't survive a page reload here. It will persist normally when this file is hosted or opened directly in a regular browser tab.</div>` : ''}
     <div class="settings-info-row"><span>Workspaces open</span><span>${state.tabs.length}</span></div>
     <div class="settings-info-row"><span>Trades logged</span><span>${state.trades.length}</span></div>
     <div class="settings-divider"></div>
