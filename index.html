@@ -405,6 +405,31 @@ textarea.notes::placeholder{color:var(--text-faint);}
 .insight-bar{height:5px;border-radius:100px;background:var(--surface-2);overflow:hidden;}
 .insight-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .3s ease;}
 
+/* ---------- Settings ---------- */
+.settings-subhead{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:10px;}
+.settings-point-list{display:flex;flex-direction:column;gap:8px;}
+.settings-point-row{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.spr-asset{font-family:var(--font-mono);font-weight:600;font-size:13px;color:var(--text-dim);flex-shrink:0;}
+.spr-input{margin-bottom:0;flex-shrink:0;width:120px;}
+.spr-input input{padding:9px 9px 9px 24px;font-size:13px;}
+.spr-input .curr{font-size:12px;left:10px;}
+.settings-btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.settings-btn{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  border:1px solid var(--border);background:var(--surface-2);color:var(--text-dim);
+  border-radius:var(--radius-sm);padding:12px 8px;font-size:12.5px;font-weight:600;
+  font-family:var(--font-body);
+}
+.settings-btn:active{background:var(--bg-elev);}
+.settings-btn.danger{border-color:rgba(199,87,79,0.4);color:var(--loss);background:var(--loss-dim);}
+.settings-btn.danger-full{width:100%;margin-top:2px;}
+.settings-divider{height:1px;background:var(--border-soft);margin:14px 0;}
+.settings-info-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;font-size:12.5px;color:var(--text-dim);}
+.settings-info-row:not(:last-child){border-bottom:1px solid var(--border-soft);}
+.settings-badge{font-family:var(--font-mono);font-size:10.5px;padding:4px 9px;border-radius:100px;background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-soft);}
+.settings-about{font-size:12px;color:var(--text-faint);line-height:1.55;margin-top:6px;}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
 /* ---------- Bottom nav ---------- */
 nav.bottomnav{
   position:fixed;left:0;right:0;bottom:0;z-index:60;
@@ -646,6 +671,10 @@ tr.row-green .live-tag{background:var(--accent);color:#04141A;}
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
       <span class="nlabel">Analytics</span>
     </button>
+    <button class="nav-btn" data-page="settings" id="navSettings">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <span class="nlabel">Settings</span>
+    </button>
   </nav>
 </div>
 
@@ -780,28 +809,26 @@ const CHECKLIST_DEF = {
   en: {
     eyebrow:'Entry Model', title:'Entry Model',
     items:[
-      {code:'M01', t:'V-Shape Recovery'},
-      {code:'M02', t:'Order Block'},
-      {code:'M03', t:'iFVG Entry'},
-      {code:'M04', t:'iFVG Mitigation'},
-      {code:'M05', t:'FBS'},
-      {code:'M06', t:'Flip Pattern'}
+      'Price closed after the last opposing FVG',
+      'Price created a clean V-shape reversal pattern',
+      'Support and resistance flip',
+      'Supply and demand flip',
+      'Order block mitigation'
     ]
   }
 };
 const POI_OPTIONS = [
-  {t:'15M Liquidity', d:'Swing H/L or equal highs/lows on 15M'},
-  {t:'15M FVG', d:'Fair Value Gap on the 15M chart'},
-  {t:'Session Open', d:'Opening price of the active session'},
-  {t:'Session Close', d:'Prior session closing price level'},
+  {t:'1D FVG', d:'Fair Value Gap on the Daily chart'},
+  {t:'4H FVG', d:'Fair Value Gap on the 4-Hour chart'},
   {t:'Session High', d:'Prior session high swept or tested'},
   {t:'Session Low', d:'Prior session low swept or tested'},
-  {t:'VAH', d:'Value Area High from volume profile'},
-  {t:'VAL', d:'Value Area Low from volume profile'},
+  {t:'15M FVG', d:'Fair Value Gap on the 15-Minute chart'},
   {t:'POC', d:'Point of Control — highest volume node'},
-  {t:'Asian IB', d:'Asian session balance (02:00–03:00 MUT)'},
-  {t:'Discount/Prem', d:'Below 50% = discount; above 50% = premium'},
-  {t:'Gaps', d:'Open gaps or FVGs from prior sessions'}
+  {t:'VAL', d:'Value Area Low from volume profile'},
+  {t:'VAH', d:'Value Area High from volume profile'},
+  {t:'SR Flip', d:'Support/resistance level flips polarity'},
+  {t:'SD Flips', d:'Supply/demand zone flips polarity'},
+  {t:'OB', d:'Order block — last opposing candle before impulse'}
 ];
 const SESSIONS = [
   {name:'Sydney',   mur:'02:00 - 11:00', utc:'22:00 - 07:00', vol:'mod'},
@@ -856,34 +883,78 @@ function normalizeTab(tab){
 
   return { ...tab, checklist, rr: tab.rr || '1:2' };
 }
-async function loadState(){
-  try{
-    const r = await window.storage.get('tt_tabs', false);
-    if(r && r.value) state.tabs = JSON.parse(r.value);
-  }catch(e){ state.tabs = []; }
-  state.tabs = state.tabs.map(normalizeTab);
-  try{
-    const r = await window.storage.get('tt_trades', false);
-    if(r && r.value) state.trades = JSON.parse(r.value);
-  }catch(e){ state.trades = []; }
-  try{
-    const r = await window.storage.get('tt_lot', false);
-    if(r && r.value) state.lot = Object.assign(state.lot, JSON.parse(r.value));
-  }catch(e){ /* keep defaults */ }
-  if(state.tabs.length) state.activeTabId = state.tabs[0].id;
-}
-async function storageSetSafe(key, value, attempt){
-  attempt = attempt || 1;
-  try{
-    await window.storage.set(key, value, false);
-  }catch(e){
-    if(attempt < 2){
-      await new Promise(res=>setTimeout(res, 700));
-      return storageSetSafe(key, value, attempt+1);
+/* ============================================================
+   PERSISTENCE
+   Uses window.storage when running inside a Claude.ai artifact
+   (that API isn't real localStorage and only exists in that host).
+   Everywhere else — a standalone deployment, GitHub Pages, etc. —
+   it transparently falls back to the browser's real localStorage,
+   so the exact same code works in both environments.
+============================================================ */
+const STORAGE_MODE = (typeof window !== 'undefined' && window.storage && typeof window.storage.get === 'function' && typeof window.storage.set === 'function')
+  ? 'artifact'
+  : 'local';
+
+async function storageGetSafe(key){
+  if(STORAGE_MODE === 'artifact'){
+    try{
+      const r = await window.storage.get(key, false);
+      return (r && typeof r.value === 'string') ? r.value : null;
+    }catch(e){
+      console.warn(`Reading "${key}" from artifact storage failed:`, e);
+      return null;
     }
-    console.warn(`Persisting "${key}" failed (will retry on next change):`, e);
+  }
+  try{
+    return window.localStorage.getItem(key);
+  }catch(e){
+    // localStorage can throw in private-browsing modes or when disabled
+    console.warn(`Reading "${key}" from localStorage failed:`, e);
+    return null;
   }
 }
+
+async function storageSetSafe(key, value, attempt){
+  attempt = attempt || 1;
+  if(STORAGE_MODE === 'artifact'){
+    try{
+      await window.storage.set(key, value, false);
+    }catch(e){
+      if(attempt < 2){
+        await new Promise(res=>setTimeout(res, 700));
+        return storageSetSafe(key, value, attempt+1);
+      }
+      console.warn(`Persisting "${key}" failed (will retry on next change):`, e);
+    }
+    return;
+  }
+  try{
+    window.localStorage.setItem(key, value);
+  }catch(e){
+    console.warn(`Persisting "${key}" to localStorage failed:`, e);
+  }
+}
+
+async function loadState(){
+  try{
+    const raw = await storageGetSafe('tt_tabs');
+    if(raw) state.tabs = JSON.parse(raw);
+  }catch(e){ state.tabs = []; }
+  state.tabs = state.tabs.map(normalizeTab);
+
+  try{
+    const raw = await storageGetSafe('tt_trades');
+    if(raw) state.trades = JSON.parse(raw);
+  }catch(e){ state.trades = []; }
+
+  try{
+    const raw = await storageGetSafe('tt_lot');
+    if(raw) state.lot = Object.assign(state.lot, JSON.parse(raw));
+  }catch(e){ /* keep defaults */ }
+
+  if(state.tabs.length) state.activeTabId = state.tabs[0].id;
+}
+
 async function saveTabs(){ storageSetSafe('tt_tabs', JSON.stringify(state.tabs)); }
 async function saveTrades(){ storageSetSafe('tt_trades', JSON.stringify(state.trades)); }
 async function saveLot(){ storageSetSafe('tt_lot', JSON.stringify(state.lot)); }
@@ -1031,6 +1102,7 @@ function renderAll(){
     document.getElementById('tabbarWrap').classList.toggle('hidden', state.page!=='trades');
     document.getElementById('navTrades').classList.toggle('active', state.page==='trades');
     document.getElementById('navAnalytics').classList.toggle('active', state.page==='analytics');
+    document.getElementById('navSettings').classList.toggle('active', state.page==='settings');
     document.getElementById('fabBtn').classList.toggle('hidden', state.page!=='trades');
     const main = document.getElementById('mainArea');
     main.innerHTML = '';
@@ -1041,11 +1113,11 @@ function renderAll(){
       } else {
         main.appendChild(renderTradePage(tab));
       }
-    } else {
+    } else if(state.page === 'analytics'){
       main.appendChild(renderAnalyticsPage());
       buildCalendar();
-      document.getElementById('calPrev').addEventListener('click', ()=>{ shiftMonth(-1); });
-      document.getElementById('calNext').addEventListener('click', ()=>{ shiftMonth(1); });
+    } else {
+      main.appendChild(renderSettingsPage());
     }
   }catch(e){
     console.warn('renderAll failed', e);
@@ -1175,16 +1247,16 @@ function renderTradePage(tab){
   enGrid.setAttribute('role', 'radiogroup');
   enDef.items.forEach(opt=>{
     const cell = document.createElement('div');
-    const sel = tab.checklist.entry === opt.t;
+    const sel = tab.checklist.entry === opt;
     cell.className = 'poi-opt' + (sel ? ' sel' : '');
-    cell.innerHTML = `<div class="poi-code">${opt.code}</div><div class="poi-t">${opt.t}</div>`;
+    cell.innerHTML = `<div class="poi-t">${opt}</div>`;
     cell.addEventListener('click', ()=>{
       if(!preDone) return;
-      tab.checklist.entry = sel ? null : opt.t;
+      tab.checklist.entry = sel ? null : opt;
       saveTabs();
       renderAll();
     });
-    makeKeyActivatable(cell, 'radio', {'aria-checked': sel ? 'true' : 'false', 'aria-label': `${opt.code}: ${opt.t}`});
+    makeKeyActivatable(cell, 'radio', {'aria-checked': sel ? 'true' : 'false', 'aria-label': opt});
     if(!preDone) cell.setAttribute('tabindex', '-1');
     enGrid.appendChild(cell);
   });
@@ -1290,6 +1362,8 @@ function renderAnalyticsPage(){
     </div>
   `;
   wrap.appendChild(calCard);
+  calCard.querySelector('#calPrev').addEventListener('click', ()=> shiftMonth(-1));
+  calCard.querySelector('#calNext').addEventListener('click', ()=> shiftMonth(1));
 
   const dayListTitle = document.createElement('div');
   dayListTitle.className = 'day-list-title';
@@ -1303,7 +1377,7 @@ function renderAnalyticsPage(){
 
   wrap.appendChild(buildInsightSection(
     'Entry Model Insights',
-    CHECKLIST_DEF.en.items.map(i=>i.t),
+    CHECKLIST_DEF.en.items,
     t=>t.entryModel
   ));
 
@@ -1339,6 +1413,144 @@ function buildInsightSection(title, keys, matchFn, labelFn){
   });
 
   return section;
+}
+
+function exportBackup(){
+  try{
+    const payload = { exportedAt: new Date().toISOString(), tabs: state.tabs, trades: state.trades, lot: state.lot };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tradejournal-backup-${new Date().toISOString().slice(0,10)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }catch(e){
+    console.warn('Export failed', e);
+    alert('Export failed — this preview environment may be blocking file downloads.');
+  }
+}
+
+function handleImportFile(file){
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(!confirm('Import this backup? It will replace your current workspaces, trades, and lot settings.')) return;
+      if(Array.isArray(data.tabs)) state.tabs = data.tabs.map(normalizeTab);
+      if(Array.isArray(data.trades)) state.trades = data.trades;
+      if(data.lot && typeof data.lot === 'object') state.lot = Object.assign(state.lot, data.lot);
+      state.activeTabId = state.tabs.length ? state.tabs[0].id : null;
+      saveTabs(); saveTrades(); saveLot();
+      renderAll();
+    }catch(err){
+      alert("That file doesn't look like a valid TradeJournal backup.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function renderSettingsPage(){
+  const wrap = document.createElement('div');
+
+  const head = document.createElement('div');
+  head.className = 'analytics-head';
+  head.innerHTML = `<h2>Settings</h2><div class="analytics-sub">Risk defaults, data, and storage</div>`;
+  wrap.appendChild(head);
+
+  // ---- Risk defaults (feeds the Lot Calculator) ----
+  const riskCard = document.createElement('div');
+  riskCard.className = 'section-card';
+  riskCard.innerHTML = `
+    <div class="section-head"><div class="section-title-wrap"><div class="section-eyebrow">Lot Calculator</div><div class="section-title">Risk Defaults</div></div></div>
+    <div class="field" style="margin-bottom:16px;">
+      <label>Default Risk Amount ($)</label>
+      <input type="number" id="setRisk" value="${state.lot.risk}">
+    </div>
+    <div class="settings-subhead">$ Value Per Point (per 1.00 lot)</div>
+    <div class="settings-point-list" id="setPointList"></div>
+  `;
+  const pointList = riskCard.querySelector('#setPointList');
+  ASSETS.forEach(a=>{
+    const row = document.createElement('div');
+    row.className = 'settings-point-row';
+    row.innerHTML = `
+      <span class="spr-asset">${ASSET_FLAG[a.sym]||''} ${a.sym}</span>
+      <div class="amount-field spr-input"><span class="curr">$</span><input type="number" step="0.01" data-asset="${a.sym}" value="${state.lot.pointValue[a.sym]}"></div>
+    `;
+    pointList.appendChild(row);
+  });
+  riskCard.querySelector('#setRisk').addEventListener('input', (e)=>{ state.lot.risk = e.target.value; saveLot(); });
+  pointList.querySelectorAll('input[data-asset]').forEach(inp=>{
+    inp.addEventListener('input', ()=>{ state.lot.pointValue[inp.dataset.asset] = inp.value; saveLot(); });
+  });
+  wrap.appendChild(riskCard);
+
+  // ---- Data management ----
+  const dataCard = document.createElement('div');
+  dataCard.className = 'section-card';
+  dataCard.innerHTML = `
+    <div class="section-head"><div class="section-title-wrap"><div class="section-eyebrow">Data</div><div class="section-title">Manage Your Data</div></div></div>
+    <div class="settings-btn-row">
+      <button class="settings-btn" id="exportBtn" type="button">Export Backup (.json)</button>
+      <button class="settings-btn" id="importBtn" type="button">Import Backup</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" class="visually-hidden">
+    <div class="settings-divider"></div>
+    <div class="settings-btn-row">
+      <button class="settings-btn danger" id="clearTradesBtn" type="button">Clear All Trades</button>
+      <button class="settings-btn danger" id="clearTabsBtn" type="button">Clear All Workspaces</button>
+    </div>
+    <button class="settings-btn danger danger-full" id="resetAllBtn" type="button">Reset Everything</button>
+  `;
+  dataCard.querySelector('#exportBtn').addEventListener('click', exportBackup);
+  const importFileEl = dataCard.querySelector('#importFile');
+  dataCard.querySelector('#importBtn').addEventListener('click', ()=> importFileEl.click());
+  importFileEl.addEventListener('change', (e)=>{
+    handleImportFile(e.target.files && e.target.files[0]);
+    e.target.value = '';
+  });
+  dataCard.querySelector('#clearTradesBtn').addEventListener('click', ()=>{
+    if(!confirm('Delete all logged trades? This cannot be undone.')) return;
+    state.trades = [];
+    saveTrades();
+    renderAll();
+  });
+  dataCard.querySelector('#clearTabsBtn').addEventListener('click', ()=>{
+    if(!confirm('Close all open workspaces? Any unsaved analysis will be lost.')) return;
+    state.tabs = [];
+    state.activeTabId = null;
+    saveTabs();
+    renderAll();
+  });
+  dataCard.querySelector('#resetAllBtn').addEventListener('click', ()=>{
+    if(!confirm('Reset the entire app? This deletes all workspaces, trades, and settings. This cannot be undone.')) return;
+    state.tabs = [];
+    state.trades = [];
+    state.activeTabId = null;
+    state.lot = { risk: 10, asset: 'NAS100', customPoints: '', pointValue: {...DEFAULT_TICK_VALUE} };
+    saveTabs(); saveTrades(); saveLot();
+    renderAll();
+  });
+  wrap.appendChild(dataCard);
+
+  // ---- Storage & about ----
+  const infoCard = document.createElement('div');
+  infoCard.className = 'section-card';
+  infoCard.innerHTML = `
+    <div class="section-head"><div class="section-title-wrap"><div class="section-eyebrow">System</div><div class="section-title">Storage &amp; About</div></div></div>
+    <div class="settings-info-row"><span>Storage mode</span><span class="settings-badge">${STORAGE_MODE === 'artifact' ? 'Claude Artifact Storage' : 'Browser LocalStorage'}</span></div>
+    <div class="settings-info-row"><span>Workspaces open</span><span>${state.tabs.length}</span></div>
+    <div class="settings-info-row"><span>Trades logged</span><span>${state.trades.length}</span></div>
+    <div class="settings-divider"></div>
+    <div class="settings-about">TradeJournal — a checklist-driven workspace built around your entry model, POI confluence, and session/killzone timing.</div>
+  `;
+  wrap.appendChild(infoCard);
+
+  return wrap;
 }
 
 function shiftMonth(delta){
@@ -1537,7 +1749,11 @@ function openCloseTradeDrawer(tab, outcome){
     updateCloseConfirmState();
     const drawerEl = document.getElementById('closeDrawer');
     openOverlay(drawerEl, document.getElementById('closeBackdrop'));
-    onceTransitionEnd(drawerEl, 400, ()=> document.getElementById('closeAmountInput')?.focus());
+    onceTransitionEnd(drawerEl, 400, ()=>{
+      if(currentOverlay && currentOverlay.el === drawerEl){
+        document.getElementById('closeAmountInput')?.focus();
+      }
+    });
   }catch(e){ console.warn('openCloseTradeDrawer failed', e); }
 }
 function updateCloseConfirmState(){
@@ -1856,6 +2072,7 @@ function initOverlays(){
 
   document.getElementById('navTrades').addEventListener('click', ()=>{ state.page='trades'; renderAll(); });
   document.getElementById('navAnalytics').addEventListener('click', ()=>{ state.page='analytics'; renderAll(); });
+  document.getElementById('navSettings').addEventListener('click', ()=>{ state.page='settings'; renderAll(); });
 }
 
 /* ============================================================
