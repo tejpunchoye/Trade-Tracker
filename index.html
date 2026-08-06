@@ -158,8 +158,8 @@ header.topbar{
   border:1px solid var(--border);padding:6px 10px;border-radius:100px;background:var(--surface-2);
 }
 .pulse-chip .pdot{width:6px;height:6px;border-radius:50%;background:var(--text-faint);}
-.pulse-chip.live .pdot{background:var(--gold);box-shadow:0 0 0 2px var(--gold-dim);animation:pulse 1.6s infinite;}
-.pulse-chip.live{color:var(--gold);border-color:rgba(255,194,78,0.35);background:var(--gold-dim);}
+.pulse-chip.live .pdot{background:var(--accent);box-shadow:0 0 0 2px var(--accent-dim);animation:pulse 1.6s infinite;}
+.pulse-chip.live{color:var(--accent);border-color:var(--accent-soft);background:var(--accent-dim);}
 
 /* ---------- Tab bar ---------- */
 .tabbar-wrap{flex-shrink:0;border-bottom:1px solid var(--border-soft);background:var(--bg-elev);}
@@ -244,7 +244,8 @@ main{
 .poi-opt .poi-t{font-size:12.5px;font-weight:700;color:var(--text);line-height:1.3;}
 .poi-opt .poi-d{font-size:10.5px;color:var(--text-faint);line-height:1.35;margin-top:3px;}
 .poi-opt .poi-code{font-family:var(--font-mono);font-size:9.5px;color:var(--text-faint);letter-spacing:.05em;margin-bottom:3px;}
-.poi-opt.sel{border-color:var(--accent-soft);background:var(--accent-dim);}
+.bias-up .poi-opt.sel{border-color:var(--accent-soft);background:var(--accent-dim);}
+.bias-down .poi-opt.sel{border-color:rgba(199,87,79,0.45);background:var(--loss-dim);}
 .poi-opt.sel .poi-t{color:var(--text);}
 .poi-opt.sel .poi-d{color:var(--text-dim);}
 @media (max-width:380px){ .poi-grid{grid-template-columns:1fr 1fr;} }
@@ -279,11 +280,13 @@ main{
   border:1px solid var(--border-soft);background:var(--bg-elev);transition:border-color .15s ease, background .15s ease;
 }
 .check-item:active{transform:scale(.98);}
-.check-item.checked{border-color:var(--accent-soft);background:var(--accent-dim);}
+.bias-up .check-item.checked{border-color:var(--accent-soft);background:var(--accent-dim);}
+.bias-down .check-item.checked{border-color:rgba(199,87,79,0.45);background:var(--loss-dim);}
 .check-flag{
   position:absolute;top:7px;right:7px;width:15px;height:15px;border-radius:5px;
-  background:var(--accent);display:flex;align-items:center;justify-content:center;
+  background:var(--accent);color:#04180F;display:flex;align-items:center;justify-content:center;
 }
+.bias-down .check-flag{background:var(--loss);color:#fff;}
 .check-label{font-size:11.5px;line-height:1.4;color:var(--text-dim);}
 .check-item.checked .check-label{color:var(--text);}
 @media (max-width:460px){ .check-list{grid-template-columns:1fr 1fr;} }
@@ -626,6 +629,16 @@ tr.row-green .live-tag{background:var(--accent);color:#04141A;}
 .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 6px;}
 .modal-head .m-asset{font-family:var(--font-mono);font-weight:700;font-size:17px;}
 .modal-sub{padding:0 18px;font-size:12px;color:var(--text-faint);margin-bottom:6px;}
+.trend-info-panel{margin:0 18px 12px;padding:12px 12px;border:1px solid var(--border-soft);border-radius:var(--radius-sm);background:var(--bg-elev);display:flex;flex-direction:column;gap:9px;}
+.trend-info-row{display:flex;align-items:flex-start;gap:9px;font-size:11.5px;color:var(--text-dim);line-height:1.45;}
+.trend-info-row b{color:var(--text);}
+.trend-info-ic{
+  flex-shrink:0;width:18px;height:18px;border-radius:50%;font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;margin-top:1px;
+}
+.trend-info-ic.up{background:var(--accent);color:#04180F;}
+.trend-info-ic.down{background:var(--loss);color:#fff;}
+.trend-info-ic.flat{background:var(--gold);color:#241400;}
 .modal-body{padding:14px 18px 20px;}
 .trend-group{margin-bottom:16px;}
 .trend-group label.tg-label{display:block;font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);margin-bottom:8px;}
@@ -673,7 +686,7 @@ tr.row-green .live-tag{background:var(--accent);color:#04141A;}
         <div class="brand-clock" id="murClock">— MUR</div>
       </div>
     </div>
-    <div class="pulse-chip" id="pulseChip"><span class="pdot"></span><span id="pulseText">No active killzone</span></div>
+    <div class="pulse-chip" id="pulseChip"><span class="pdot"></span><span id="pulseText">Inactive</span></div>
   </header>
 
   <div class="tabbar-wrap" id="tabbarWrap">
@@ -821,6 +834,11 @@ tr.row-green .live-tag{background:var(--accent);color:#04141A;}
     </button>
   </div>
   <div class="modal-sub">Set the trade range before opening the analysis workspace.</div>
+  <div class="trend-info-panel" id="trendInfoPanel">
+    <div class="trend-info-row"><span class="trend-info-ic up">↑</span><div><b>Uptrend</b> — bearish leg fails to break the low of the last bullish leg.</div></div>
+    <div class="trend-info-row"><span class="trend-info-ic down">↓</span><div><b>Downtrend</b> — bullish leg fails to break the high of the last bearish leg.</div></div>
+    <div class="trend-info-row"><span class="trend-info-ic flat">↔</span><div><b>Consolidating</b> — price is making equal highs and lows with no clear directional structure.</div></div>
+  </div>
   <div class="modal-body">
     <div class="trend-group">
       <label class="tg-label">4-Hour Trade Range</label>
@@ -870,26 +888,35 @@ const CHECKLIST_DEF = {
   en: {
     eyebrow:'Entry Model', title:'Entry Model',
     items:[
-      'Price closed after the last opposing FVG',
-      'Price created a clean V-shape reversal pattern',
-      'Support and resistance flip',
-      'Supply and demand flip',
-      'Order block mitigation'
+      {t:'FVG Filled', d:'Price closed after the last opposing FVG'},
+      {t:'V-Shape', d:'Price created a clean V-Shape reversal pattern'},
+      {t:'SR Flip', d:'Support and Resistance flip'},
+      {t:'SD Flip', d:'Supply and demand flip'},
+      {t:'OB', d:'Order Block mitigation'}
     ]
   }
 };
 const POI_OPTIONS = [
   {t:'1D FVG', d:'Fair Value Gap on the Daily chart'},
   {t:'4H FVG', d:'Fair Value Gap on the 4-Hour chart'},
+  {t:'15M FVG', d:'Fair Value Gap on the 15-Minute chart'},
   {t:'Session High', d:'Prior session high swept or tested'},
   {t:'Session Low', d:'Prior session low swept or tested'},
-  {t:'15M FVG', d:'Fair Value Gap on the 15-Minute chart'},
   {t:'POC', d:'Point of Control — highest volume node'},
   {t:'VAL', d:'Value Area Low from volume profile'},
   {t:'VAH', d:'Value Area High from volume profile'},
   {t:'SR Flip', d:'Support/resistance level flips polarity'},
   {t:'SD Flips', d:'Supply/demand zone flips polarity'},
   {t:'OB', d:'Order block — last opposing candle before impulse'}
+];
+const SWEEP_OPTIONS = [
+  {t:'Equal Highs/Lows', d:'Liquidity resting on equal highs or lows'},
+  {t:'Trendline Tap Run', d:'Liquidity run off a trendline tap'},
+  {t:'Session High', d:"Prior session's high swept"},
+  {t:'Session Low', d:"Prior session's low swept"},
+  {t:'FVG', d:'Sweep reacted through a Fair Value Gap'},
+  {t:'OB', d:'Sweep reacted through an Order Block'},
+  {t:'SDZ', d:'Sweep reacted through a Supply/Demand Zone'}
 ];
 const SESSIONS = [
   {name:'Sydney',   mur:'02:00 - 11:00', utc:'22:00 - 07:00', vol:'mod'},
@@ -944,9 +971,16 @@ function normalizeTab(tab){
   const pre = [];
   for(let i=0; i<wantPre; i++) pre.push(!!srcPre[i]);
 
+  let poi = [];
+  if(Array.isArray(srcChecklist.poi)) poi = srcChecklist.poi.slice();
+  else if(typeof srcChecklist.poi === 'string' && srcChecklist.poi) poi = [srcChecklist.poi];
+
+  let sweep = Array.isArray(srcChecklist.sweep) ? srcChecklist.sweep.slice() : [];
+
   const checklist = {
     pre,
-    poi: srcChecklist.poi === undefined ? null : srcChecklist.poi,
+    poi,
+    sweep,
     entry: srcChecklist.entry === undefined ? null : srcChecklist.entry
   };
 
@@ -1307,6 +1341,8 @@ function progressRingSVG(pct, id){
 
 function renderTradePage(tab){
   const wrap = document.createElement('div');
+  const biasClass = tab.htf === 'up' ? 'bias-up' : 'bias-down';
+  wrap.className = biasClass;
 
   const head = document.createElement('div');
   head.className = 'trade-head';
@@ -1352,7 +1388,7 @@ function renderTradePage(tab){
   });
   wrap.appendChild(preCard);
 
-  // ---- Analysis / POI (single-select, locked until Pre-Analysis complete, no progress ring) ----
+  // ---- Analysis / POI (multi-select, locked until Pre-Analysis complete, no progress ring) ----
   const poiCard = document.createElement('div');
   poiCard.className = 'section-card' + (preDone ? '' : ' locked');
   poiCard.innerHTML = `
@@ -1366,23 +1402,58 @@ function renderTradePage(tab){
     <div class="poi-grid"></div>
   `;
   const poiGrid = poiCard.querySelector('.poi-grid');
-  poiGrid.setAttribute('role', 'radiogroup');
+  poiGrid.setAttribute('role', 'group');
+  poiGrid.setAttribute('aria-label', 'POI — select all that apply');
   POI_OPTIONS.forEach(opt=>{
     const cell = document.createElement('div');
-    const sel = tab.checklist.poi === opt.t;
+    const sel = tab.checklist.poi.includes(opt.t);
     cell.className = 'poi-opt' + (sel ? ' sel' : '');
     cell.innerHTML = `<div class="poi-t">${opt.t}</div><div class="poi-d">${opt.d}</div>`;
     cell.addEventListener('click', ()=>{
       if(!preDone) return;
-      tab.checklist.poi = sel ? null : opt.t;
+      if(sel) tab.checklist.poi = tab.checklist.poi.filter(x=>x!==opt.t);
+      else tab.checklist.poi.push(opt.t);
       saveTabs();
       renderAll();
     });
-    makeKeyActivatable(cell, 'radio', {'aria-checked': sel ? 'true' : 'false', 'aria-label': `${opt.t}: ${opt.d}`});
+    makeKeyActivatable(cell, 'checkbox', {'aria-checked': sel ? 'true' : 'false', 'aria-label': `${opt.t}: ${opt.d}`});
     if(!preDone) cell.setAttribute('tabindex', '-1');
     poiGrid.appendChild(cell);
   });
   wrap.appendChild(poiCard);
+
+  // ---- Liquidity Sweep (multi-select, separate from POIs) ----
+  const sweepCard = document.createElement('div');
+  sweepCard.className = 'section-card' + (preDone ? '' : ' locked');
+  sweepCard.innerHTML = `
+    <div class="section-head">
+      <div class="section-title-wrap">
+        <div class="section-eyebrow">Analysis</div>
+        <div class="section-title">Liquidity Sweep</div>
+      </div>
+    </div>
+    <div class="poi-grid"></div>
+  `;
+  const sweepGrid = sweepCard.querySelector('.poi-grid');
+  sweepGrid.setAttribute('role', 'group');
+  sweepGrid.setAttribute('aria-label', 'Liquidity sweep — select all that apply');
+  SWEEP_OPTIONS.forEach(opt=>{
+    const cell = document.createElement('div');
+    const sel = tab.checklist.sweep.includes(opt.t);
+    cell.className = 'poi-opt' + (sel ? ' sel' : '');
+    cell.innerHTML = `<div class="poi-t">${opt.t}</div><div class="poi-d">${opt.d}</div>`;
+    cell.addEventListener('click', ()=>{
+      if(!preDone) return;
+      if(sel) tab.checklist.sweep = tab.checklist.sweep.filter(x=>x!==opt.t);
+      else tab.checklist.sweep.push(opt.t);
+      saveTabs();
+      renderAll();
+    });
+    makeKeyActivatable(cell, 'checkbox', {'aria-checked': sel ? 'true' : 'false', 'aria-label': `${opt.t}: ${opt.d}`});
+    if(!preDone) cell.setAttribute('tabindex', '-1');
+    sweepGrid.appendChild(cell);
+  });
+  wrap.appendChild(sweepCard);
 
   // ---- Entry Model (single-select, locked until Pre-Analysis complete, no progress ring) ----
   const enDef = CHECKLIST_DEF.en;
@@ -1400,16 +1471,16 @@ function renderTradePage(tab){
   enGrid.setAttribute('role', 'radiogroup');
   enDef.items.forEach(opt=>{
     const cell = document.createElement('div');
-    const sel = tab.checklist.entry === opt;
+    const sel = tab.checklist.entry === opt.t;
     cell.className = 'poi-opt' + (sel ? ' sel' : '');
-    cell.innerHTML = `<div class="poi-t">${opt}</div>`;
+    cell.innerHTML = `<div class="poi-t">${opt.t}</div><div class="poi-d">${opt.d}</div>`;
     cell.addEventListener('click', ()=>{
       if(!preDone) return;
-      tab.checklist.entry = sel ? null : opt;
+      tab.checklist.entry = sel ? null : opt.t;
       saveTabs();
       renderAll();
     });
-    makeKeyActivatable(cell, 'radio', {'aria-checked': sel ? 'true' : 'false', 'aria-label': opt});
+    makeKeyActivatable(cell, 'radio', {'aria-checked': sel ? 'true' : 'false', 'aria-label': `${opt.t}: ${opt.d}`});
     if(!preDone) cell.setAttribute('tabindex', '-1');
     enGrid.appendChild(cell);
   });
@@ -1432,7 +1503,7 @@ function renderTradePage(tab){
 }
 
 function checkSVG(){
-  return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#04120C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+  return `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 }
 
 /* ============================================================
@@ -1567,7 +1638,7 @@ function renderAnalyticsPage(){
 
   wrap.appendChild(buildInsightSection(
     'Entry Model Insights',
-    CHECKLIST_DEF.en.items,
+    CHECKLIST_DEF.en.items.map(i=>i.t),
     t=>t.entryModel
   ));
 
@@ -1910,7 +1981,8 @@ document.getElementById('confirmTrendBtn').addEventListener('click', ()=>{
     createdAt: Date.now(),
     checklist: {
       pre: CHECKLIST_DEF.pre.items.map(()=>false),
-      poi: null,
+      poi: [],
+      sweep: [],
       entry: null
     }
   };
@@ -2284,17 +2356,15 @@ function renderNotesBody(){
 /* live top-bar pulse */
 function updatePulse(){
   document.getElementById('murClock').textContent = fmtMURClock();
-  const nowMin = nowMURMinutes();
   const activeKZ = getActiveKillzone();
   const chip = document.getElementById('pulseChip');
   const txt = document.getElementById('pulseText');
   if(activeKZ){
     chip.classList.add('live');
-    txt.textContent = activeKZ.name + ' active';
+    txt.textContent = activeKZ.name;
   } else {
     chip.classList.remove('live');
-    const activeSess = SESSIONS.filter(s=>inRange(nowMin,s.mur)).map(s=>s.name);
-    txt.textContent = activeSess.length ? activeSess.slice(0,2).join(' + ') + ' open' : 'No active killzone';
+    txt.textContent = 'Inactive';
   }
   // refresh session drawer live if open
   if(currentOverlay && currentOverlay.el && currentOverlay.el.id === 'sessDrawer'){
